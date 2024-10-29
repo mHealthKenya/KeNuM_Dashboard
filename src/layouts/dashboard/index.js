@@ -62,7 +62,7 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 icon="leaderboard"
-                title="Today's Checkinss"
+                title="Today's Checkins"
                 count="230"
                 percentage={{
                   color: "primary",
