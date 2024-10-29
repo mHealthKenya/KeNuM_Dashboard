@@ -42,15 +42,25 @@ import Rotations from "layouts/rotations";
 import Events from "layouts/events";
 import Billing from "layouts/billing";
 import RTL from "layouts/rtl";
-import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
+import Knowledgebase from "layouts/knowledgebase";
+import Faq from "layouts/faq";
+import FAQ from "layouts/faq";
 
 const routes = [
+  {
+    type: "collapse",
+    name: "Profile",
+    key: "profile",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/profile",
+    component: <Profile />,
+  },
   {
     type: "collapse",
     name: "Dashboard",
@@ -101,27 +111,19 @@ const routes = [
   // },
   {
     type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
-  },
-  {
-    type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
-  },
-  {
-    type: "collapse",
     name: "Knowledge Base",
-    key: "profile",
+    key: "knowledgebase",
     icon: <Icon fontSize="small">book</Icon>,
-    // route: "/profile",
-    component: <Profile />,
+    route: "/knowledgebase",
+    component: <Knowledgebase />,
+  },
+  {
+    type: "collapse",
+    name: "faq",
+    key: "faq",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/faq",
+    component: <FAQ />,
   },
 
   // {
