@@ -49,7 +49,6 @@ import SignUp from "layouts/authentication/sign-up";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import Knowledgebase from "layouts/knowledgebase";
-import Faq from "layouts/faq";
 import FAQ from "layouts/faq";
 
 const routes = [
