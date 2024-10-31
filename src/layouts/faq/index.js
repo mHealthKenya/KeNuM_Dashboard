@@ -97,7 +97,7 @@ function FAQ() {
                   variant="contained"
                   color="primary"
                   onClick={handleAddFaq}
-                  style={{ color: "white" }} // Change text color to white
+                  style={{ color: "white" }}
                 >
                   Add FAQ
                 </Button>

@@ -118,7 +118,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "faq",
+    name: "FAQs",
     key: "faq",
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/faq",
