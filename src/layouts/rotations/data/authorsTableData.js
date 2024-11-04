@@ -63,7 +63,7 @@ export default function data() {
         function: <Job title="Manager" description="Organization" />,
         status: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="online" color="success" variant="gradient" size="sm" />
+            <MDBadge badgeContent="active" color="success" variant="gradient" size="sm" />
           </MDBox>
         ),
         employed: (
@@ -82,7 +82,7 @@ export default function data() {
         function: <Job title="Programator" description="Developer" />,
         status: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="offline" color="dark" variant="gradient" size="sm" />
+            <MDBadge badgeContent="inactive" color="dark" variant="gradient" size="sm" />
           </MDBox>
         ),
         employed: (
@@ -101,7 +101,7 @@ export default function data() {
         function: <Job title="Executive" description="Projects" />,
         status: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="online" color="success" variant="gradient" size="sm" />
+            <MDBadge badgeContent="active" color="success" variant="gradient" size="sm" />
           </MDBox>
         ),
         employed: (
@@ -120,7 +120,7 @@ export default function data() {
         function: <Job title="Programator" description="Developer" />,
         status: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="online" color="success" variant="gradient" size="sm" />
+            <MDBadge badgeContent="active" color="success" variant="gradient" size="sm" />
           </MDBox>
         ),
         employed: (
@@ -139,7 +139,7 @@ export default function data() {
         function: <Job title="Manager" description="Executive" />,
         status: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="offline" color="dark" variant="gradient" size="sm" />
+            <MDBadge badgeContent="inactive" color="dark" variant="gradient" size="sm" />
           </MDBox>
         ),
         employed: (
@@ -158,7 +158,7 @@ export default function data() {
         function: <Job title="Programator" description="Developer" />,
         status: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="offline" color="dark" variant="gradient" size="sm" />
+            <MDBadge badgeContent="inactive" color="dark" variant="gradient" size="sm" />
           </MDBox>
         ),
         employed: (
@@ -177,7 +177,7 @@ export default function data() {
         function: <Job title="Manager" description="Organization" />,
         status: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="online" color="success" variant="gradient" size="sm" />
+            <MDBadge badgeContent="active" color="success" variant="gradient" size="sm" />
           </MDBox>
         ),
         employed: (
