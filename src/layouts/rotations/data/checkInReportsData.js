@@ -1,6 +1,7 @@
-// layouts/rotations/data/checkInReportsData.js
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+// import "jspdf-autotable";
 
-// Sample columns and rows for Check-In Reports
 export default function checkInReportsData() {
   const columns = [
     { Header: "Date", accessor: "date", width: "15%", align: "left" },
@@ -32,8 +33,29 @@ export default function checkInReportsData() {
       status: "Delayed",
       comments: "Delay due to equipment issue.",
     },
-    // Add more rows as needed
   ];
 
-  return { columns, rows };
+  // Function to download data as CSV
+  const downloadCSV = () => {
+    const csvContent = [
+      columns.map((col) => col.Header).join(","),
+      ...rows.map((row) => columns.map((col) => row[col.accessor]).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "CheckInReports.csv");
+  };
+
+  // Function to print data as PDF
+  const printPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Check-In Reports", 10, 10);
+    doc.autoTable({
+      head: [columns.map((col) => col.Header)],
+      body: rows.map((row) => columns.map((col) => row[col.accessor])),
+    });
+    doc.save("CheckInReports.pdf");
+  };
+
+  return { columns, rows, downloadCSV, printPDF };
 }

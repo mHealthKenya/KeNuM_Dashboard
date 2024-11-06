@@ -1,21 +1,7 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
+import Button from "@mui/material/Button";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -33,7 +19,12 @@ import checkInReportsData from "layouts/rotations/data/checkInReportsData";
 
 function Tables() {
   const { columns, rows } = authorsTableData();
-  const { columns: checkInColumns, rows: checkInRows } = checkInReportsData();
+  const {
+    columns: checkInColumns,
+    rows: checkInRows,
+    downloadCSV,
+    printPDF,
+  } = checkInReportsData();
 
   return (
     <DashboardLayout>
@@ -94,6 +85,19 @@ function Tables() {
                   showTotalEntries={false}
                   noEndBorder
                 />
+              </MDBox>
+              <MDBox px={2} py={2} display="flex" justifyContent="flex-end">
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={downloadCSV}
+                  style={{ marginRight: "10px", color: "white" }}
+                >
+                  Download CSV
+                </Button>
+                {/* <Button variant="contained" color="secondary" onClick={printPDF}>
+                  Print as PDF
+                </Button> */}
               </MDBox>
             </Card>
           </Grid>
