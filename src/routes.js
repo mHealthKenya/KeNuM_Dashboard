@@ -45,6 +45,7 @@ import RTL from "layouts/rtl";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import User from "layouts/user";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
@@ -54,19 +55,19 @@ import FAQ from "layouts/faq";
 const routes = [
   {
     type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
-  },
-  {
-    type: "collapse",
     name: "Dashboard",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
+  },
+  {
+    type: "collapse",
+    name: "Add User",
+    key: "user",
+    icon: <Icon fontSize="small">add</Icon>,
+    route: "/user",
+    component: <User />,
   },
   {
     type: "collapse",
@@ -88,7 +89,7 @@ const routes = [
     type: "collapse",
     name: "CPD Events",
     key: "events",
-    icon: <Icon fontSize="small">list</Icon>,
+    icon: <Icon fontSize="small">circle</Icon>,
     route: "/events",
     component: <Events />,
   },
@@ -123,6 +124,14 @@ const routes = [
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/faq",
     component: <FAQ />,
+  },
+  {
+    type: "collapse",
+    name: "Profile",
+    key: "profile",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/profile",
+    component: <Profile />,
   },
 
   // {
