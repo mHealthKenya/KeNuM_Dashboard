@@ -30,6 +30,7 @@ import createCache from "@emotion/cache";
 
 // Material Dashboard 2 React routes
 import routes from "routes";
+import cnoroutes from "cno-routes";
 
 // Material Dashboard 2 React contexts
 import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "context";
@@ -156,6 +157,10 @@ export default function App() {
           {getRoutes(routes)}
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
+        <Routes>
+          {getRoutes(cnoroutes)}
+          <Route path="*" element={<Navigate to="/dashboard/cno" />} />
+        </Routes>
       </ThemeProvider>
     </CacheProvider>
   ) : (
@@ -178,7 +183,7 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to="/authentication/sign-in" />} />
       </Routes>
     </ThemeProvider>
   );

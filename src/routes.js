@@ -39,6 +39,7 @@ Coded by www.creative-tim.com
 import Dashboard from "layouts/dashboard";
 import Tables from "layouts/tables";
 import Rotations from "layouts/rotations";
+import Checkin from "layouts/checkin";
 import Events from "layouts/events";
 import Billing from "layouts/billing";
 import RTL from "layouts/rtl";
@@ -51,6 +52,7 @@ import User from "layouts/user";
 import Icon from "@mui/material/Icon";
 import Knowledgebase from "layouts/knowledgebase";
 import FAQ from "layouts/faq";
+import DashboardCNO from "layouts_cno/dashboard";
 
 const routes = [
   {
@@ -61,22 +63,22 @@ const routes = [
     route: "/dashboard",
     component: <Dashboard />,
   },
-  {
-    type: "collapse",
-    name: "Add User",
-    key: "user",
-    icon: <Icon fontSize="small">add</Icon>,
-    route: "/user",
-    component: <User />,
-  },
-  {
-    type: "collapse",
-    name: "Users",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Add User",
+  //   key: "user",
+  //   icon: <Icon fontSize="small">add</Icon>,
+  //   route: "/user",
+  //   component: <User />,
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Users",
+  //   key: "tables",
+  //   icon: <Icon fontSize="small">table_view</Icon>,
+  //   route: "/tables",
+  //   component: <Tables />,
+  // },
   {
     type: "collapse",
     name: "Rotations",
@@ -87,12 +89,20 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "CPD Events",
-    key: "events",
-    icon: <Icon fontSize="small">circle</Icon>,
-    route: "/events",
-    component: <Events />,
+    name: "Checkins",
+    key: "checkin",
+    icon: <Icon fontSize="small">task</Icon>,
+    route: "/checkins",
+    component: <Checkin />,
   },
+  // {
+  //   type: "collapse",
+  //   name: "CPD Events",
+  //   key: "events",
+  //   icon: <Icon fontSize="small">circle</Icon>,
+  //   route: "/events",
+  //   component: <Events />,
+  // },
   // {
   //   type: "collapse",
   //   name: "Billing",
@@ -109,22 +119,22 @@ const routes = [
   //   route: "/rtl",
   //   component: <RTL />,
   // },
-  {
-    type: "collapse",
-    name: "Knowledge Base",
-    key: "knowledgebase",
-    icon: <Icon fontSize="small">book</Icon>,
-    route: "/knowledgebase",
-    component: <Knowledgebase />,
-  },
-  {
-    type: "collapse",
-    name: "FAQs",
-    key: "faq",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/faq",
-    component: <FAQ />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Knowledge Base",
+  //   key: "knowledgebase",
+  //   icon: <Icon fontSize="small">book</Icon>,
+  //   route: "/knowledgebase",
+  //   component: <Knowledgebase />,
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "FAQs",
+  //   key: "faq",
+  //   icon: <Icon fontSize="small">notifications</Icon>,
+  //   route: "/faq",
+  //   component: <FAQ />,
+  // },
   {
     type: "collapse",
     name: "Profile",
@@ -134,14 +144,23 @@ const routes = [
     component: <Profile />,
   },
 
-  // {
-  //   type: "collapse",
-  //   name: "Sign In",
-  //   key: "sign-in",
-  //   icon: <Icon fontSize="small">login</Icon>,
-  //   route: "/authentication/sign-in",
-  //   component: <SignIn />,
-  // },
+  {
+    // type: "collapse",
+    // name: "Sign In",
+    // key: "sign-in",
+    // icon: <Icon fontSize="small">login</Icon>,
+    route: "/authentication/sign-in",
+    component: <SignIn />,
+  },
+
+  {
+    // type: "collapse",
+    // name: "Sign In",
+    // key: "sign-in",
+    // icon: <Icon fontSize="small">login</Icon>,
+    route: "/dashboard/cno",
+    component: <DashboardCNO />,
+  },
   // {
   //   type: "collapse",
   //   name: "Sign Up",

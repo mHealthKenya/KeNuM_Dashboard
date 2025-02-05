@@ -2,6 +2,8 @@
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -16,9 +18,18 @@ import DataTable from "examples/Tables/DataTable";
 // Data
 import authorsTableData from "layouts/rotations/data/authorsTableData";
 import checkInReportsData from "layouts/rotations/data/checkInReportsData";
+import studentsTableData from "layouts/rotations/data/studentsTableData";
+
+// Import useState hook
+import React, { useState } from "react";
 
 function Tables() {
-  const { columns, rows } = authorsTableData();
+  // State to track the active tab
+  const [activeTab, setActiveTab] = useState(0);
+
+  // Get data for authors and students
+  const { columns: authorsColumns, rows: authorsRows } = authorsTableData();
+  const { columns: studentsColumns, rows: studentsRows } = studentsTableData();
   const {
     columns: checkInColumns,
     rows: checkInRows,
@@ -26,13 +37,26 @@ function Tables() {
     printPDF,
   } = checkInReportsData();
 
+  // Handle tab change
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
-            {/* Supervisors List Table */}
+            {/* Tabs for switching between Authors and Students data */}
+            <Tabs value={activeTab} onChange={handleTabChange} centered>
+              <Tab label="Supervisors" />
+              <Tab label="Students" />
+            </Tabs>
+          </Grid>
+
+          <Grid item xs={12}>
+            {/* Conditionally render data based on active tab */}
             <Card>
               <MDBox
                 mx={2}
@@ -45,59 +69,20 @@ function Tables() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Supervisors List
+                  {activeTab === 0 ? "Supervisors List" : "Students List"}
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
                 <DataTable
-                  table={{ columns, rows }}
+                  table={{
+                    columns: activeTab === 0 ? authorsColumns : studentsColumns,
+                    rows: activeTab === 0 ? authorsRows : studentsRows,
+                  }}
                   isSorted={false}
                   entriesPerPage={false}
                   showTotalEntries={false}
                   noEndBorder
                 />
-              </MDBox>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12}>
-            {/* Check-In Reports Table */}
-            <Card>
-              <MDBox
-                mx={2}
-                mt={-3}
-                py={3}
-                px={2}
-                variant="gradient"
-                bgColor="success"
-                borderRadius="lg"
-                coloredShadow="success"
-              >
-                <MDTypography variant="h6" color="white">
-                  Check-In Reports
-                </MDTypography>
-              </MDBox>
-              <MDBox pt={3}>
-                <DataTable
-                  table={{ columns: checkInColumns, rows: checkInRows }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
-              </MDBox>
-              <MDBox px={2} py={2} display="flex" justifyContent="flex-end">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={downloadCSV}
-                  style={{ marginRight: "10px", color: "white" }}
-                >
-                  Download CSV
-                </Button>
-                {/* <Button variant="contained" color="secondary" onClick={printPDF}>
-                  Print as PDF
-                </Button> */}
               </MDBox>
             </Card>
           </Grid>

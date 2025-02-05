@@ -25,9 +25,10 @@ import MDBadge from "components/MDBadge";
 import team2 from "assets/images/team-2.jpg";
 import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
+import { Name } from "ajv";
 
 export default function data() {
-  const Author = ({ image, name, email }) => (
+  const Name = ({ image, name, email }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDAvatar src={image} name={name} size="sm" />
       <MDBox ml={2} lineHeight={1}>
@@ -50,25 +51,26 @@ export default function data() {
 
   return {
     columns: [
-      { Header: "author", accessor: "author", width: "45%", align: "left" },
-      { Header: "function", accessor: "function", align: "left" },
-      { Header: "status", accessor: "status", align: "center" },
-      { Header: "License", accessor: "employed", align: "center" },
+      { Header: "name", accessor: "name", width: "30%", align: "left" },
+      { Header: "contact", accessor: "contact", align: "left" },
+      { Header: "Facility", accessor: "facility", align: "center" },
+      { Header: "county", accessor: "county", align: "center" },
       { Header: "action", accessor: "action", align: "center" },
     ],
 
     rows: [
       {
-        author: <Author image={team2} name="John Michael" email="john@creative-tim.com" />,
-        function: <Job title="Manager" description="Organization" />,
-        status: (
-          <MDBox ml={-1}>
-            <MDBadge badgeContent="active" color="success" variant="gradient" size="sm" />
-          </MDBox>
-        ),
-        employed: (
+        name: <Name image={team2} name="John Michael" email="john@creative-tim.com" />,
+        contact: <Job title="+254878876662" />,
+
+        facility: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            23/04/18
+            Facility A
+          </MDTypography>
+        ),
+        county: (
+          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+            Mombasa
           </MDTypography>
         ),
         action: (
@@ -78,16 +80,17 @@ export default function data() {
         ),
       },
       {
-        author: <Author image={team3} name="Alexa Liras" email="alexa@creative-tim.com" />,
-        function: <Job title="Programator" description="Developer" />,
-        status: (
-          <MDBox ml={-1}>
-            <MDBadge badgeContent="inactive" color="dark" variant="gradient" size="sm" />
-          </MDBox>
-        ),
-        employed: (
+        name: <Name image={team3} name="Alexa Liras" email="alexa@creative-tim.com" />,
+        contact: <Job title="+254878876662" />,
+
+        facility: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            11/01/19
+            Facility B
+          </MDTypography>
+        ),
+        county: (
+          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+            Kwale
           </MDTypography>
         ),
         action: (
@@ -97,16 +100,17 @@ export default function data() {
         ),
       },
       {
-        author: <Author image={team4} name="Laurent Perrier" email="laurent@creative-tim.com" />,
-        function: <Job title="Executive" description="Projects" />,
-        status: (
-          <MDBox ml={-1}>
-            <MDBadge badgeContent="active" color="success" variant="gradient" size="sm" />
-          </MDBox>
-        ),
-        employed: (
+        name: <Name image={team4} name="Laurent Perrier" email="laurent@creative-tim.com" />,
+        contact: <Job title="+254878876662" />,
+
+        facility: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            19/09/17
+            Facility C
+          </MDTypography>
+        ),
+        county: (
+          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+            Sugoi
           </MDTypography>
         ),
         action: (
@@ -116,16 +120,17 @@ export default function data() {
         ),
       },
       {
-        author: <Author image={team3} name="Michael Levi" email="michael@creative-tim.com" />,
-        function: <Job title="Programator" description="Developer" />,
-        status: (
-          <MDBox ml={-1}>
-            <MDBadge badgeContent="active" color="success" variant="gradient" size="sm" />
-          </MDBox>
-        ),
-        employed: (
+        name: <Name image={team3} name="Michael Levi" email="michael@creative-tim.com" />,
+        contact: <Job title="+254878876662" />,
+
+        facility: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            24/12/08
+            Facility D
+          </MDTypography>
+        ),
+        county: (
+          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+            Moyale
           </MDTypography>
         ),
         action: (
@@ -135,16 +140,17 @@ export default function data() {
         ),
       },
       {
-        author: <Author image={team3} name="Richard Gran" email="richard@creative-tim.com" />,
-        function: <Job title="Manager" description="Executive" />,
-        status: (
-          <MDBox ml={-1}>
-            <MDBadge badgeContent="inactive" color="dark" variant="gradient" size="sm" />
-          </MDBox>
-        ),
-        employed: (
+        name: <Name image={team3} name="Richard Gran" email="richard@creative-tim.com" />,
+        contact: <Job title="+254878876662" />,
+
+        facility: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            04/10/21
+            Facility E
+          </MDTypography>
+        ),
+        county: (
+          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+            Homa Bay
           </MDTypography>
         ),
         action: (
@@ -154,16 +160,17 @@ export default function data() {
         ),
       },
       {
-        author: <Author image={team4} name="Miriam Eric" email="miriam@creative-tim.com" />,
-        function: <Job title="Programator" description="Developer" />,
-        status: (
-          <MDBox ml={-1}>
-            <MDBadge badgeContent="inactive" color="dark" variant="gradient" size="sm" />
-          </MDBox>
-        ),
-        employed: (
+        name: <Name image={team4} name="Miriam Eric" email="miriam@creative-tim.com" />,
+        contact: <Job title="+254878876662" />,
+
+        facility: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            14/09/20
+            Facility F
+          </MDTypography>
+        ),
+        county: (
+          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+            Kajiado
           </MDTypography>
         ),
         action: (
@@ -173,16 +180,17 @@ export default function data() {
         ),
       },
       {
-        author: <Author image={team2} name="John Michael" email="john@creative-tim.com" />,
-        function: <Job title="Manager" description="Organization" />,
-        status: (
-          <MDBox ml={-1}>
-            <MDBadge badgeContent="active" color="success" variant="gradient" size="sm" />
-          </MDBox>
-        ),
-        employed: (
+        name: <Name image={team2} name="John Michael" email="john@creative-tim.com" />,
+        contact: <Job title="+254878876662" />,
+
+        facility: (
           <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-            23/04/18
+            Facility G
+          </MDTypography>
+        ),
+        county: (
+          <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+            Mwingi
           </MDTypography>
         ),
         action: (
