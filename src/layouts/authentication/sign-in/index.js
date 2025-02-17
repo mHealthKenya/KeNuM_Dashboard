@@ -55,8 +55,8 @@ function Basic() {
           <MDTypography variant="h4" fontWeight="medium" color="white" mt={4}>
             Sign in
           </MDTypography>
-          <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
-            <Grid item xs={2}>
+          {/* <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
+            <Grid item xs={2}> 
               <MDTypography component={MuiLink} href="#" variant="body1" color="white">
                 <FacebookIcon color="inherit" />
               </MDTypography>
@@ -71,7 +71,7 @@ function Basic() {
                 <GoogleIcon color="inherit" />
               </MDTypography>
             </Grid>
-          </Grid>
+          </Grid> */}
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form">
@@ -99,7 +99,7 @@ function Basic() {
               </MDButton>
             </MDBox>
             <MDBox mt={3} mb={1} textAlign="center">
-              <MDTypography variant="button" color="text">
+              {/* <MDTypography variant="button" color="text">
                 Don&apos;t have an account?{" "}
                 <MDTypography
                   component={Link}
@@ -108,10 +108,26 @@ function Basic() {
                   color="info"
                   fontWeight="medium"
                   textGradient
-                >
-                  Sign up
+                > 
+                  Forgot Passworrd?
                 </MDTypography>
-              </MDTypography>
+              </MDTypography> */}
+              <MDBox textAlign="left">
+                <MDTypography variant="button" color="text">
+                  <MDTypography
+                    component="a"
+                    href="https://osp.nckenya.go.ke/password"
+                    variant="button"
+                    color="info"
+                    fontWeight="medium"
+                    textGradient
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Forgot Password?
+                  </MDTypography>
+                </MDTypography>
+              </MDBox>
             </MDBox>
           </MDBox>
         </MDBox>

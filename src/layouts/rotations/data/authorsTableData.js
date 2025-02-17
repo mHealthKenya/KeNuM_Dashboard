@@ -60,7 +60,7 @@ export default function data() {
 
     rows: [
       {
-        name: <Name image={team2} name="John Michael" email="john@creative-tim.com" />,
+        name: <Name name="John Mureithi" />,
         contact: <Job title="+254878876662" />,
 
         facility: (
@@ -79,8 +79,28 @@ export default function data() {
           </MDTypography>
         ),
       },
+      // {
+      //   name: <Name image={team3} name="Alex Cheruto" />,
+      //   contact: <Job title="+254878876662" />,
+
+      //   facility: (
+      //     <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+      //       Facility B
+      //     </MDTypography>
+      //   ),
+      //   county: (
+      //     <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+      //       Kwale
+      //     </MDTypography>
+      //   ),
+      //   action: (
+      //     <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+      //       Edit
+      //     </MDTypography>
+      //   ),
+      // },
       {
-        name: <Name image={team3} name="Alexa Liras" email="alexa@creative-tim.com" />,
+        name: <Name name="Alex Cheruto" />,
         contact: <Job title="+254878876662" />,
 
         facility: (
@@ -100,7 +120,7 @@ export default function data() {
         ),
       },
       {
-        name: <Name image={team4} name="Laurent Perrier" email="laurent@creative-tim.com" />,
+        name: <Name name="Lauren Cherop" />,
         contact: <Job title="+254878876662" />,
 
         facility: (
@@ -120,7 +140,7 @@ export default function data() {
         ),
       },
       {
-        name: <Name image={team3} name="Michael Levi" email="michael@creative-tim.com" />,
+        name: <Name name="Michael Omwami" />,
         contact: <Job title="+254878876662" />,
 
         facility: (
@@ -140,7 +160,7 @@ export default function data() {
         ),
       },
       {
-        name: <Name image={team3} name="Richard Gran" email="richard@creative-tim.com" />,
+        name: <Name name="Richard Ochieng" />,
         contact: <Job title="+254878876662" />,
 
         facility: (
@@ -160,7 +180,7 @@ export default function data() {
         ),
       },
       {
-        name: <Name image={team4} name="Miriam Eric" email="miriam@creative-tim.com" />,
+        name: <Name name="Miriam Wairimu" />,
         contact: <Job title="+254878876662" />,
 
         facility: (
@@ -180,7 +200,7 @@ export default function data() {
         ),
       },
       {
-        name: <Name image={team2} name="John Michael" email="john@creative-tim.com" />,
+        name: <Name name="John Kyalo" />,
         contact: <Job title="+254878876662" />,
 
         facility: (
