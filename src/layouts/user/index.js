@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { addUser } from "services/user/userService";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -6,6 +7,7 @@ import Card from "@mui/material/Card";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
+import Alert from "@mui/material/Alert";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -16,33 +18,76 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
+// Role Mapping for API
+const roleMapping = {
+  "NCK Admin": "NCK",
+  "CPD Provider": "Provider",
+  "Internship Coordinator": "CNO",
+  "Facility Supervisor": "FACILITY_SUPERVISOR",
+  "Rotations Supervisor": "ROTATIONS_SUPERVISOR",
+};
+
 function AddUser() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [nationalID, setNationalID] = useState(""); // Optional field
   const [role, setRole] = useState("");
   const [gender, setGender] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
 
-  const handleAddUser = () => {
-    if (firstName && lastName && email && phoneNumber && role && gender) {
+  const handleAddUser = async () => {
+    if (!firstName || !lastName || !email || !phoneNumber || !role || !gender) {
+      setMessage({ type: "error", text: "Please fill in all required fields." });
+      return;
+    }
+
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+
+    try {
       const newUser = {
-        firstName,
-        lastName,
+        national_id: nationalID || null, // Optional
+        f_name: firstName,
+        l_name: lastName,
         email,
-        phoneNumber,
-        role,
+        phone_number: phoneNumber,
+        role: roleMapping[role], // Convert role to API expected format
         gender,
       };
-      console.log("User added:", newUser);
+
+      const response = await addUser(newUser);
+
+      console.log("Server Response:", response);
+
+      setMessage({ type: "success", text: "User successfully added!" });
       setFirstName("");
       setLastName("");
       setEmail("");
       setPhoneNumber("");
+      setNationalID("");
       setRole("");
       setGender("");
-    } else {
-      alert("Please fill in all fields.");
+    } catch (err) {
+      let errorMessage = "An error occurred. Please try again.";
+
+      if (err.message.includes("400")) {
+        errorMessage = "Invalid input. Please check your details.";
+      } else if (err.message.includes("401")) {
+        errorMessage = "Unauthorized! Please log in again.";
+      } else if (err.message.includes("403")) {
+        errorMessage = "You do not have permission to perform this action.";
+      } else if (err.message.includes("500")) {
+        errorMessage = "Server error! Please try again later.";
+      } else {
+        errorMessage = err.message;
+      }
+
+      setMessage({ type: "error", text: errorMessage });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,10 +106,16 @@ function AddUser() {
                   All fields marked with * are required fields
                 </MDTypography>
 
+                {message.text && (
+                  <Alert severity={message.type} sx={{ mb: 2 }}>
+                    {message.text}
+                  </Alert>
+                )}
+
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextField
-                      label="First Name"
+                      label="First Name *"
                       fullWidth
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
@@ -72,7 +123,7 @@ function AddUser() {
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Last Name"
+                      label="Last Name *"
                       fullWidth
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
@@ -80,7 +131,7 @@ function AddUser() {
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Email"
+                      label="Email *"
                       type="email"
                       fullWidth
                       value={email}
@@ -89,50 +140,67 @@ function AddUser() {
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Phone Number"
+                      label="Phone Number *"
                       type="tel"
                       fullWidth
                       value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+                        setPhoneNumber(value);
+                      }}
+                      inputProps={{ maxLength: 15 }} // Limit phone number length
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="National ID (Optional)"
+                      type="tel"
+                      fullWidth
+                      value={nationalID}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+                        setNationalID(value);
+                      }}
+                      inputProps={{ maxLength: 15 }} // Limit ID length
                     />
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
                       select
-                      label="Role"
+                      label="Role *"
                       fullWidth
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
-                      InputLabelProps={{
-                        style: { fontSize: "16px" },
-                      }}
-                      InputProps={{
-                        style: { height: "56px", padding: "0 14px" },
+                      sx={{ height: 56 }} // Increase dropdown size
+                      SelectProps={{
+                        sx: { height: 56, fontSize: 16, padding: "10px" }, // Increase font and padding
                       }}
                     >
-                      <MenuItem value="NCK Admin">NCK Admin</MenuItem>
-                      <MenuItem value="CPD Provider">CPD Provider</MenuItem>
-                      <MenuItem value="Internship Coordinator">Internship Coordinator</MenuItem>
-                      <MenuItem value="Internship Coordinator">Facility Supervisor</MenuItem>
-                      <MenuItem value="Internship Coordinator">Rotations Supervisor</MenuItem>
+                      {Object.keys(roleMapping).map((key) => (
+                        <MenuItem key={key} value={key} sx={{ fontSize: 16 }}>
+                          {key}
+                        </MenuItem>
+                      ))}
                     </TextField>
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
                       select
-                      label="Gender"
+                      label="Gender *"
                       fullWidth
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
-                      InputLabelProps={{
-                        style: { fontSize: "16px" },
-                      }}
-                      InputProps={{
-                        style: { height: "56px", padding: "0 14px" },
+                      sx={{ height: 56 }} // Increase dropdown size
+                      SelectProps={{
+                        sx: { height: 56, fontSize: 16, padding: "10px" }, // Increase font and padding
                       }}
                     >
-                      <MenuItem value="Male">Male</MenuItem>
-                      <MenuItem value="Female">Female</MenuItem>
+                      <MenuItem value="Male" sx={{ fontSize: 16 }}>
+                        Male
+                      </MenuItem>
+                      <MenuItem value="Female" sx={{ fontSize: 16 }}>
+                        Female
+                      </MenuItem>
                     </TextField>
                   </Grid>
                   <Grid item xs={12}>
@@ -141,9 +209,10 @@ function AddUser() {
                       color="primary"
                       onClick={handleAddUser}
                       fullWidth
+                      disabled={loading}
                       style={{ color: "white" }}
                     >
-                      Add User
+                      {loading ? "Adding..." : "Add User"}
                     </Button>
                   </Grid>
                 </Grid>

@@ -88,7 +88,7 @@ function Footer({ light }) {
                   fontWeight="regular"
                   color={light ? "white" : "dark"}
                 >
-                  Nusring Council
+                  Nursing Council
                 </MDTypography>
               </Link>
             </MDBox>

@@ -1,93 +1,145 @@
+import React from "react";
+import { Navigate } from "react-router-dom";
+import Icon from "@mui/material/Icon";
+
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
+import Users from "layouts/tables";
 import Rotations from "layouts/rotations";
 import Checkin from "layouts/checkin";
 import Events from "layouts/events";
-import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
 import User from "layouts/user";
-
-// @mui icons
-import Icon from "@mui/material/Icon";
 import Knowledgebase from "layouts/knowledgebase";
 import FAQ from "layouts/faq";
 import DashboardCNO from "layouts_cno/dashboard";
 
-const routes = [
+const getUserRole = () => localStorage.getItem("role");
+const isAuthenticated = () => !!localStorage.getItem("authToken");
+const hasAccess = (allowedRoles) => isAuthenticated() && allowedRoles.includes(getUserRole());
+
+const commonRoutes = [
+  { route: "/authentication/sign-in", component: <SignIn /> },
+  {
+    route: "/profile",
+    component: isAuthenticated() ? <Profile /> : <Navigate to="/authentication/sign-in" replace />,
+  },
+];
+
+const generalUserRoutes = [
   {
     type: "collapse",
     name: "Dashboard",
     key: "dashboard",
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
-    component: <Dashboard />,
+    component: isAuthenticated() ? (
+      <Dashboard />
+    ) : (
+      <Navigate to="/authentication/sign-in" replace />
+    ),
   },
-  {
-    type: "collapse",
-    name: "Add User",
-    key: "user",
-    icon: <Icon fontSize="small">add</Icon>,
-    route: "/user",
-    component: <User />,
-  },
-  {
-    type: "collapse",
-    name: "Users",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Knowledge Base",
+  //   key: "knowledgebase",
+  //   icon: <Icon fontSize="small">book</Icon>,
+  //   route: "/knowledgebase",
+  //   component: isAuthenticated() ? (
+  //     <Knowledgebase />
+  //   ) : (
+  //     <Navigate to="/authentication/sign-in" replace />
+  //   ),
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "FAQs",
+  //   key: "faq",
+  //   icon: <Icon fontSize="small">notifications</Icon>,
+  //   route: "/faq",
+  //   component: isAuthenticated() ? <FAQ /> : <Navigate to="/authentication/sign-in" replace />,
+  // },
+];
+
+const cnoRoutes = [
+  // {
+  //   type: "collapse",
+  //   name: "CNO Dashboard",
+  //   key: "dashboard_cno",
+  //   icon: <Icon fontSize="small">dashboard</Icon>,
+  //   route: "/dashboard/cno",
+  //   component: hasAccess(["CNO"]) ? <DashboardCNO /> : <Navigate to="/dashboard" replace />,
+  // },
   {
     type: "collapse",
     name: "Rotations",
     key: "rotations",
     icon: <Icon fontSize="small">list</Icon>,
-    route: "/rotations",
-    component: <Rotations />,
+    route: "/cno/rotations",
+    component: hasAccess(["CNO"]) ? <Rotations /> : <Navigate to="/dashboard" replace />,
   },
   {
     type: "collapse",
     name: "Checkins",
     key: "checkin",
     icon: <Icon fontSize="small">task</Icon>,
-    route: "/checkins",
-    component: <Checkin />,
+    route: "/cno/checkins",
+    component: hasAccess(["CNO"]) ? <Checkin /> : <Navigate to="/dashboard" replace />,
   },
+];
+
+const providerRoutes = [
   {
     type: "collapse",
     name: "CPD Events",
     key: "events",
     icon: <Icon fontSize="small">circle</Icon>,
-    route: "/events",
-    component: <Events />,
+    route: "/provider/events",
+    component: hasAccess(["Provider"]) ? <Events /> : <Navigate to="/dashboard" replace />,
+  },
+];
+
+const adminRoutes = [
+  // {
+  //   type: "collapse",
+  //   name: "Dashboard",
+  //   key: "dashboard",
+  //   icon: <Icon fontSize="small">dashboard</Icon>,
+  //   route: "/dashboard",
+  //   component: isAuthenticated() ? (
+  //     <Dashboard />
+  //   ) : (
+  //     <Navigate to="/authentication/sign-in" replace />
+  //   ),
+  // },
+
+  {
+    type: "collapse",
+    name: "Add User",
+    key: "user",
+    icon: <Icon fontSize="small">add</Icon>,
+    route: "/user",
+    component: isAuthenticated() ? <User /> : <Navigate to="/authentication/sign-in" replace />,
   },
   {
     type: "collapse",
-    name: "Billing",
-    key: "billing",
-    icon: <Icon fontSize="small">receipt_long</Icon>,
-    route: "/billing",
-    component: <Billing />,
+    name: "Users",
+    key: "users",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/users",
+    component: isAuthenticated() ? <Users /> : <Navigate to="/authentication/sign-in" replace />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "RTL",
-  //   key: "rtl",
-  //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-  //   route: "/rtl",
-  //   component: <RTL />,
-  // },
   {
     type: "collapse",
     name: "Knowledge Base",
     key: "knowledgebase",
     icon: <Icon fontSize="small">book</Icon>,
     route: "/knowledgebase",
-    component: <Knowledgebase />,
+    component: isAuthenticated() ? (
+      <Knowledgebase />
+    ) : (
+      <Navigate to="/authentication/sign-in" replace />
+    ),
   },
   {
     type: "collapse",
@@ -95,42 +147,22 @@ const routes = [
     key: "faq",
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/faq",
-    component: <FAQ />,
+    component: isAuthenticated() ? <FAQ /> : <Navigate to="/authentication/sign-in" replace />,
   },
-  {
-    type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
-  },
-
-  {
-    // type: "collapse",
-    // name: "Sign In",
-    // key: "sign-in",
-    // icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
-  },
-
-  {
-    // type: "collapse",
-    // name: "Sign In",
-    // key: "sign-in",
-    // icon: <Icon fontSize="small">login</Icon>,
-    route: "/dashboard/cno",
-    component: <DashboardCNO />,
-  },
-  // {
-  //   type: "collapse",
-  //   name: "Sign Up",
-  //   key: "sign-up",
-  //   icon: <Icon fontSize="small">assignment</Icon>,
-  //   route: "/authentication/sign-up",
-  //   component: <SignUp />,
-  // },
 ];
+
+const getRoutesForRole = () => {
+  const role = getUserRole();
+  if (!isAuthenticated()) return commonRoutes;
+
+  let roleRoutes = [...generalUserRoutes];
+  if (role === "CNO") roleRoutes = [...roleRoutes, ...cnoRoutes];
+  if (role === "Provider") roleRoutes = [...roleRoutes, ...providerRoutes];
+  if (role === "Admin") roleRoutes = [...roleRoutes, ...adminRoutes];
+
+  return [...commonRoutes, ...roleRoutes];
+};
+
+const routes = getRoutesForRole();
 
 export default routes;
