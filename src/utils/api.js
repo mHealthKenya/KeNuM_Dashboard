@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8000/"; // Update this with your actual API URL
-
+// const API_BASE_URL = "http://localhost:8000/";
+const API_BASE_URL = "https://kenumdashboardapi.estore.africa/";
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
