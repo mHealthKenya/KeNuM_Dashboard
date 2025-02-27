@@ -17,7 +17,8 @@ import authorsTableData from "layouts/tables/data/users";
 import projectsTableData from "layouts/tables/data/projectsTableData";
 
 function Users() {
-  const { columns, rows } = authorsTableData();
+  // Get table data and modal from authorsTableData
+  const { columns, rows, modal } = authorsTableData();
   const { columns: pColumns, rows: pRows } = projectsTableData();
 
   return (
@@ -81,6 +82,10 @@ function Users() {
           </Grid>
         </Grid>
       </MDBox>
+
+      {/* Render the modal here */}
+      {modal}
+
       <Footer />
     </DashboardLayout>
   );
