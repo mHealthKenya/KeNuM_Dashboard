@@ -36,6 +36,43 @@ function Basic() {
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
+  // const handleSignIn = async () => {
+  //   setError("");
+  //   setLoading(true);
+
+  //   try {
+  //     // Await the response from AuthService.login
+  //     const response = await AuthService.login(email, password);
+
+  //     // Ensure response contains necessary data
+  //     if (!response || !response.token || !response.user.role) {
+  //       throw new Error("Invalid response from server. Please try again.");
+  //     }
+
+  //     // Store auth token and role
+  //     localStorage.setItem("authToken", response.token);
+  //     localStorage.setItem("role", response.user.role);
+  //     localStorage.setItem("userId", response.user.id);
+  //     window.dispatchEvent(new Event("storage"));
+
+  //     // Redirect based on user role
+  //     switch (response.role) {
+  //       case "Admin":
+  //         navigate("/routes");
+  //         break;
+  //       case "CNO":
+  //         navigate("/cno-routes");
+  //         break;
+  //       default:
+  //         navigate("/dashboard");
+  //     }
+  //   } catch (err) {
+  //     setError(err.message || "Incorrect email or password. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSignIn = async () => {
     setError("");
     setLoading(true);
@@ -61,10 +98,10 @@ function Basic() {
       // Redirect based on confirmed user role
       switch (confirmedRole) {
         case "Admin":
-          navigate("/admin-dashboard"); // Adjust the route as needed
+          navigate("/routes"); // Adjust the route as needed
           break;
         case "CNO":
-          navigate("/cno-dashboard"); // Adjust the route as needed
+          navigate("/cno-routes"); // Adjust the route as needed
           break;
         default:
           navigate("/dashboard"); // Default dashboard for other roles
