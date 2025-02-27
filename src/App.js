@@ -9,13 +9,12 @@ import themeDark from "assets/theme-dark";
 import rtlPlugin from "stylis-plugin-rtl";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
-import routes from "routes";
-import cnoroutes from "cno-routes";
 import { useMaterialUIController } from "context";
 import brandWhite from "assets/images/ncklogo.png";
 import brandDark from "assets/images/ncklogo.png";
 import SignIn from "layouts/authentication/sign-in";
 import PropTypes from "prop-types";
+import useRoutes from "routes"; // Import the custom hook for dynamic routes
 
 // Check if user is authenticated
 const isAuthenticated = () => !!localStorage.getItem("authToken");
@@ -43,6 +42,9 @@ export default function App() {
   } = controller;
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
+
+  // Use the custom hook to dynamically generate routes
+  const routes = useRoutes();
 
   useMemo(() => {
     setRtlCache(
@@ -82,7 +84,7 @@ export default function App() {
                         (transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite
                       }
                       brandName="Nursing Council of Kenya"
-                      routes={routes}
+                      routes={routes} // Pass dynamically generated routes to Sidenav
                     />
                     <Configurator />
                   </>
@@ -121,7 +123,7 @@ export default function App() {
                       (transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite
                     }
                     brandName="Nursing Council of Kenya"
-                    routes={routes}
+                    routes={routes} // Pass dynamically generated routes to Sidenav
                   />
                   <Configurator />
                 </>

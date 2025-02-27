@@ -55,16 +55,19 @@ function Basic() {
       localStorage.setItem("userId", response.user.id);
       window.dispatchEvent(new Event("storage"));
 
-      // Redirect based on user role
-      switch (response.role) {
+      // Confirm the role before redirecting
+      const confirmedRole = response.user.role;
+
+      // Redirect based on confirmed user role
+      switch (confirmedRole) {
         case "Admin":
-          navigate("/routes");
+          navigate("/admin-dashboard"); // Adjust the route as needed
           break;
         case "CNO":
-          navigate("/cno-routes");
+          navigate("/cno-dashboard"); // Adjust the route as needed
           break;
         default:
-          navigate("/dashboard");
+          navigate("/dashboard"); // Default dashboard for other roles
       }
     } catch (err) {
       setError(err.message || "Incorrect email or password. Please try again.");

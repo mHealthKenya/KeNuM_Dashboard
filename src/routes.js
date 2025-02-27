@@ -14,10 +14,12 @@ import Knowledgebase from "layouts/knowledgebase";
 import FAQ from "layouts/faq";
 import DashboardCNO from "layouts_cno/dashboard";
 
+// Helper functions
 const getUserRole = () => localStorage.getItem("role");
 const isAuthenticated = () => !!localStorage.getItem("authToken");
 const hasAccess = (allowedRoles) => isAuthenticated() && allowedRoles.includes(getUserRole());
 
+// Common routes (accessible to all users)
 const commonRoutes = [
   { route: "/authentication/sign-in", component: <SignIn /> },
   {
@@ -26,6 +28,7 @@ const commonRoutes = [
   },
 ];
 
+// Routes for general users
 const generalUserRoutes = [
   {
     type: "collapse",
@@ -39,37 +42,10 @@ const generalUserRoutes = [
       <Navigate to="/authentication/sign-in" replace />
     ),
   },
-  // {
-  //   type: "collapse",
-  //   name: "Knowledge Base",
-  //   key: "knowledgebase",
-  //   icon: <Icon fontSize="small">book</Icon>,
-  //   route: "/knowledgebase",
-  //   component: isAuthenticated() ? (
-  //     <Knowledgebase />
-  //   ) : (
-  //     <Navigate to="/authentication/sign-in" replace />
-  //   ),
-  // },
-  // {
-  //   type: "collapse",
-  //   name: "FAQs",
-  //   key: "faq",
-  //   icon: <Icon fontSize="small">notifications</Icon>,
-  //   route: "/faq",
-  //   component: isAuthenticated() ? <FAQ /> : <Navigate to="/authentication/sign-in" replace />,
-  // },
 ];
 
+// Routes for CNO users
 const cnoRoutes = [
-  // {
-  //   type: "collapse",
-  //   name: "CNO Dashboard",
-  //   key: "dashboard_cno",
-  //   icon: <Icon fontSize="small">dashboard</Icon>,
-  //   route: "/dashboard/cno",
-  //   component: hasAccess(["CNO"]) ? <DashboardCNO /> : <Navigate to="/dashboard" replace />,
-  // },
   {
     type: "collapse",
     name: "Rotations",
@@ -88,6 +64,7 @@ const cnoRoutes = [
   },
 ];
 
+// Routes for Provider users
 const providerRoutes = [
   {
     type: "collapse",
@@ -99,20 +76,8 @@ const providerRoutes = [
   },
 ];
 
+// Routes for Admin users
 const adminRoutes = [
-  // {
-  //   type: "collapse",
-  //   name: "Dashboard",
-  //   key: "dashboard",
-  //   icon: <Icon fontSize="small">dashboard</Icon>,
-  //   route: "/dashboard",
-  //   component: isAuthenticated() ? (
-  //     <Dashboard />
-  //   ) : (
-  //     <Navigate to="/authentication/sign-in" replace />
-  //   ),
-  // },
-
   {
     type: "collapse",
     name: "Add User",
@@ -151,7 +116,8 @@ const adminRoutes = [
   },
 ];
 
-const getRoutesForRole = () => {
+// Custom hook to dynamically generate routes
+const useRoutes = () => {
   const role = getUserRole();
   if (!isAuthenticated()) return commonRoutes;
 
@@ -163,6 +129,4 @@ const getRoutesForRole = () => {
   return [...commonRoutes, ...roleRoutes];
 };
 
-const routes = getRoutesForRole();
-
-export default routes;
+export default useRoutes;

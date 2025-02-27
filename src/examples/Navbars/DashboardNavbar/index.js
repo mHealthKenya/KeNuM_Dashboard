@@ -49,6 +49,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("role");
     navigate("/");
   };
 

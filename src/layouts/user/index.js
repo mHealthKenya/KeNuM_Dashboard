@@ -23,8 +23,10 @@ const roleMapping = {
   "NCK Admin": "NCK",
   "CPD Provider": "Provider",
   "Internship Coordinator": "CNO",
-  "Facility Supervisor": "FACILITY_SUPERVISOR",
-  "Rotations Supervisor": "ROTATIONS_SUPERVISOR",
+  // "Facility Supervisor": "FACILITY_SUPERVISOR",
+  // "Rotations Supervisor": "ROTATIONS_SUPERVISOR",
+  "Facility Supervisor": "CNO",
+  "Rotations Supervisor": "CNO",
 };
 
 function AddUser() {

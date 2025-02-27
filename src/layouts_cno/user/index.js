@@ -113,8 +113,8 @@ function AddUser() {
                       <MenuItem value="NCK Admin">NCK Admin</MenuItem>
                       <MenuItem value="CPD Provider">CPD Provider</MenuItem>
                       <MenuItem value="Internship Coordinator">Internship Coordinator</MenuItem>
-                      <MenuItem value="Internship Coordinator">Facility Supervisor</MenuItem>
-                      <MenuItem value="Internship Coordinator">Rotations Supervisor</MenuItem>
+                      <MenuItem value="Facility Supervisor">Facility Supervisor</MenuItem>
+                      <MenuItem value="Rotation Supervisor">Rotations Supervisor</MenuItem>
                     </TextField>
                   </Grid>
                   <Grid item xs={12}>
