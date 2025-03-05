@@ -142,7 +142,7 @@ export default function DataTable() {
             variant="contained"
             color="primary"
             size="small"
-            startIcon={<EditIcon sx={{ color: "white" }} />}
+            startIcon={<EditIcon sx={{ color: "#FEFEFE" }} />}
             onClick={() => handleOpenEditModal(user)}
           >
             {loading ? (
@@ -161,6 +161,15 @@ export default function DataTable() {
             onClick={() => handleDeleteUser(user.id)}
           >
             Delete
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            startIcon={<EditIcon sx={{ color: "#FEFEFE" }} />}
+            onClick={() => handleDeleteUser(user.id)}
+          >
+            <span style={{ color: "white" }}>Permissions</span>
           </Button>
         </MDBox>
       ),
