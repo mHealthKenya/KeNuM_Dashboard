@@ -51,7 +51,7 @@ const cnoRoutes = [
     name: "Rotations",
     key: "rotations",
     icon: <Icon fontSize="small">list</Icon>,
-    route: "/cno/rotations",
+    route: "/rotations",
     component: hasAccess(["CNO"]) ? <Rotations /> : <Navigate to="/dashboard" replace />,
   },
   {
@@ -59,7 +59,7 @@ const cnoRoutes = [
     name: "Checkins",
     key: "checkin",
     icon: <Icon fontSize="small">task</Icon>,
-    route: "/cno/checkins",
+    route: "/checkins",
     component: hasAccess(["CNO"]) ? <Checkin /> : <Navigate to="/dashboard" replace />,
   },
 ];
@@ -71,7 +71,7 @@ const providerRoutes = [
     name: "CPD Events",
     key: "events",
     icon: <Icon fontSize="small">circle</Icon>,
-    route: "/provider/events",
+    route: "/events",
     component: hasAccess(["Provider"]) ? <Events /> : <Navigate to="/dashboard" replace />,
   },
 ];
