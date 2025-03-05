@@ -1,4 +1,4 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Icon from "@mui/material/Icon";
 
@@ -17,116 +17,106 @@ import DashboardCNO from "layouts_cno/dashboard";
 // Helper functions
 const getUserRole = () => localStorage.getItem("role");
 const isAuthenticated = () => !!localStorage.getItem("authToken");
-const hasAccess = (allowedRoles) => isAuthenticated() && allowedRoles.includes(getUserRole());
+const hasAccess = (allowedRoles, role) => isAuthenticated() && allowedRoles.includes(role);
 
-// Common routes (accessible to all users)
-const commonRoutes = [
-  { route: "/authentication/sign-in", component: <SignIn /> },
-  {
-    route: "/profile",
-    component: isAuthenticated() ? <Profile /> : <Navigate to="/authentication/sign-in" replace />,
-  },
-];
-
-// Routes for general users
-const generalUserRoutes = [
-  {
-    type: "collapse",
-    name: "Dashboard",
-    key: "dashboard",
-    icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/dashboard",
-    component: isAuthenticated() ? (
-      <Dashboard />
-    ) : (
-      <Navigate to="/authentication/sign-in" replace />
-    ),
-  },
-];
-
-// Routes for CNO users
-const cnoRoutes = [
-  {
-    type: "collapse",
-    name: "Rotations",
-    key: "rotations",
-    icon: <Icon fontSize="small">list</Icon>,
-    route: "/rotations",
-    component: hasAccess(["CNO"]) ? <Rotations /> : <Navigate to="/dashboard" replace />,
-  },
-  {
-    type: "collapse",
-    name: "Checkins",
-    key: "checkin",
-    icon: <Icon fontSize="small">task</Icon>,
-    route: "/checkins",
-    component: hasAccess(["CNO"]) ? <Checkin /> : <Navigate to="/dashboard" replace />,
-  },
-];
-
-// Routes for Provider users
-const providerRoutes = [
-  {
-    type: "collapse",
-    name: "CPD Events",
-    key: "events",
-    icon: <Icon fontSize="small">circle</Icon>,
-    route: "/events",
-    component: hasAccess(["Provider"]) ? <Events /> : <Navigate to="/dashboard" replace />,
-  },
-];
-
-// Routes for Admin users
-const adminRoutes = [
-  {
-    type: "collapse",
-    name: "Add User",
-    key: "user",
-    icon: <Icon fontSize="small">add</Icon>,
-    route: "/user",
-    component: isAuthenticated() ? <User /> : <Navigate to="/authentication/sign-in" replace />,
-  },
-  {
-    type: "collapse",
-    name: "Users",
-    key: "users",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/users",
-    component: isAuthenticated() ? <Users /> : <Navigate to="/authentication/sign-in" replace />,
-  },
-  {
-    type: "collapse",
-    name: "Knowledge Base",
-    key: "knowledgebase",
-    icon: <Icon fontSize="small">book</Icon>,
-    route: "/knowledgebase",
-    component: isAuthenticated() ? (
-      <Knowledgebase />
-    ) : (
-      <Navigate to="/authentication/sign-in" replace />
-    ),
-  },
-  {
-    type: "collapse",
-    name: "FAQs",
-    key: "faq",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/faq",
-    component: isAuthenticated() ? <FAQ /> : <Navigate to="/authentication/sign-in" replace />,
-  },
-];
-
-// Custom hook to dynamically generate routes
 const useRoutes = () => {
-  const role = getUserRole();
-  if (!isAuthenticated()) return commonRoutes;
+  const [role, setRole] = useState(getUserRole());
 
-  let roleRoutes = [...generalUserRoutes];
-  if (role === "CNO") roleRoutes = [...roleRoutes, ...cnoRoutes];
-  if (role === "Provider") roleRoutes = [...roleRoutes, ...providerRoutes];
-  if (role === "Admin") roleRoutes = [...roleRoutes, ...adminRoutes];
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setRole(getUserRole());
+    };
 
-  return [...commonRoutes, ...roleRoutes];
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  if (!isAuthenticated()) return [{ route: "/authentication/sign-in", component: <SignIn /> }];
+
+  let roleRoutes = [
+    {
+      type: "collapse",
+      name: "Dashboard",
+      key: "dashboard",
+      icon: <Icon fontSize="small">dashboard</Icon>,
+      route: "/dashboard",
+      component: <Dashboard />,
+    },
+  ];
+
+  if (role === "CNO") {
+    roleRoutes.push(
+      {
+        type: "collapse",
+        name: "Rotations",
+        key: "rotations",
+        icon: <Icon fontSize="small">list</Icon>,
+        route: "/rotations",
+        component: <Rotations />,
+      },
+      {
+        type: "collapse",
+        name: "Checkins",
+        key: "checkin",
+        icon: <Icon fontSize="small">task</Icon>,
+        route: "/checkins",
+        component: <Checkin />,
+      }
+    );
+  }
+
+  if (role === "Provider") {
+    roleRoutes.push({
+      type: "collapse",
+      name: "CPD Events",
+      key: "events",
+      icon: <Icon fontSize="small">circle</Icon>,
+      route: "/events",
+      component: <Events />,
+    });
+  }
+
+  if (role === "Admin") {
+    roleRoutes.push(
+      {
+        type: "collapse",
+        name: "Add User",
+        key: "user",
+        icon: <Icon fontSize="small">add</Icon>,
+        route: "/user",
+        component: <User />,
+      },
+      {
+        type: "collapse",
+        name: "Users",
+        key: "users",
+        icon: <Icon fontSize="small">table_view</Icon>,
+        route: "/users",
+        component: <Users />,
+      },
+      {
+        type: "collapse",
+        name: "Knowledge Base",
+        key: "knowledgebase",
+        icon: <Icon fontSize="small">book</Icon>,
+        route: "/knowledgebase",
+        component: <Knowledgebase />,
+      },
+      {
+        type: "collapse",
+        name: "FAQs",
+        key: "faq",
+        icon: <Icon fontSize="small">notifications</Icon>,
+        route: "/faq",
+        component: <FAQ />,
+      }
+    );
+  }
+
+  return [{ route: "/profile", component: <Profile /> }, ...roleRoutes];
 };
 
 export default useRoutes;
