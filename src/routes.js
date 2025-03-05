@@ -72,7 +72,7 @@ const providerRoutes = [
     key: "events",
     icon: <Icon fontSize="small">circle</Icon>,
     route: "/events",
-    component: hasAccess(["Provider"]) ? <Events /> : <Navigate to="/dashboard" replace />,
+    component: isAuthenticated(["Provider"]) ? <Events /> : <Navigate to="/dashboard" replace />,
   },
 ];
 
