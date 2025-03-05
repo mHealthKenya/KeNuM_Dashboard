@@ -15,13 +15,19 @@ import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatist
 // Data
 import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
 import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
+import licenseRegistrationBarChartData from "layouts/dashboard/data/comparisonBarGraph";
 
 // Dashboard components
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
+// Custom Bar Chart Component (fallback)
+import CustomBarChart from "layouts/dashboard/data/customBarChart";
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
+
+  // Debugging: Log the chart data
+  console.log("Chart Data:", licenseRegistrationBarChartData);
 
   return (
     <DashboardLayout>
@@ -30,31 +36,12 @@ function Dashboard() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="dark"
-                icon="people"
-                title="Interns"
-                count={281}
-                percentage={{
-                  color: "success",
-                  amount: "+30%",
-                  label: "than lask year",
-                }}
-              />
+              <ComplexStatisticsCard color="dark" icon="people" title="Interns" count={281} />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Total Checkins"
-                count="230"
-                percentage={{
-                  color: "primary",
-                  amount: "-3%",
-                  label: "than last month",
-                }}
-              />
+              <ComplexStatisticsCard icon="leaderboard" title="Total Checkins" count="230" />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
@@ -64,11 +51,6 @@ function Dashboard() {
                 icon="store"
                 title="Active Users"
                 count="3,400"
-                percentage={{
-                  color: "success",
-                  amount: "+1%",
-                  label: "than last month",
-                }}
               />
             </MDBox>
           </Grid>
@@ -79,11 +61,6 @@ function Dashboard() {
                 icon="person_add"
                 title="Practitioners"
                 count="+291"
-                percentage={{
-                  color: "success",
-                  amount: "",
-                  label: "Just updated",
-                }}
               />
             </MDBox>
           </Grid>
@@ -94,9 +71,8 @@ function Dashboard() {
               <MDBox mb={3}>
                 <ReportsBarChart
                   color="info"
-                  title="license Renewals"
+                  title="License Renewals"
                   description="Last Renewal Performance"
-                  date="update sent 2 days ago"
                   chart={reportsBarChartData}
                 />
               </MDBox>
@@ -105,7 +81,7 @@ function Dashboard() {
               <MDBox mb={3}>
                 <ReportsLineChart
                   color="success"
-                  title="daily rotations"
+                  title="Daily Rotations"
                   description={
                     <>
                       (<strong>+15%</strong>) increase in today rotations.
@@ -120,9 +96,8 @@ function Dashboard() {
               <MDBox mb={3}>
                 <ReportsLineChart
                   color="dark"
-                  title="registrations"
+                  title="Registrations"
                   description="Last Performance"
-                  date="just updated"
                   chart={tasks}
                 />
               </MDBox>
@@ -136,6 +111,18 @@ function Dashboard() {
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               {/* <OrdersOverview /> */}
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* Add the combined bar graph here */}
+        <MDBox mt={4.5}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
+                {/* Use CustomBarChart if ReportsBarChart doesn't work */}
+                <CustomBarChart data={licenseRegistrationBarChartData} />
+              </MDBox>
             </Grid>
           </Grid>
         </MDBox>

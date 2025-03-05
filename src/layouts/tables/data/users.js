@@ -3,7 +3,17 @@ import { getAllUsers } from "services/user/userService"; // Import API function
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import PropTypes from "prop-types";
-import { Button, Modal, TextField, Box, Typography } from "@mui/material";
+import {
+  Button,
+  Modal,
+  TextField,
+  Box,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -206,13 +216,21 @@ export default function DataTable() {
                 defaultValue={selectedUser.phone_number}
                 margin="normal"
               />
-              <TextField
-                fullWidth
-                label="Role"
-                name="role"
-                defaultValue={selectedUser.role}
-                margin="normal"
-              />
+              <FormControl fullWidth margin="normal" sx={{ minHeight: 56 }}>
+                <InputLabel>Role</InputLabel>
+                <Select
+                  name="role"
+                  defaultValue={selectedUser.role}
+                  label="Role"
+                  sx={{ height: 40 }}
+                >
+                  <MenuItem value="admin">Admin</MenuItem>
+                  <MenuItem value="user">User</MenuItem>
+                  <MenuItem value="CNO">CNO</MenuItem>
+                  <MenuItem value="Provider">Provider</MenuItem>
+                </Select>
+              </FormControl>
+
               <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
                 <Button
                   variant="contained"
