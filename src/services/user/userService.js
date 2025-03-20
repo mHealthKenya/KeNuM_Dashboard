@@ -32,3 +32,22 @@ export const getAllUsers = async () => {
     throw new Error(error.response?.data?.message || "Failed to fetch users.");
   }
 };
+
+export const updateUser = async (id, updatedData) => {
+  try {
+    const response = await api.patch(`users/update`, updatedData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      `Error ${error.response?.status}: ${error.message}` ||
+      "Failed to update user.";
+
+    throw new Error(errorMessage);
+  }
+};

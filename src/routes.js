@@ -3,6 +3,8 @@ import { Navigate } from "react-router-dom";
 import Icon from "@mui/material/Icon";
 
 import Dashboard from "layouts/dashboard";
+import StudentDashboard from "layouts/dashboardstudent";
+import PractitionerDashboard from "layouts/dashboardpractitioner";
 import Users from "layouts/tables";
 import Rotations from "layouts/rotations";
 import Checkin from "layouts/checkin";
@@ -12,19 +14,19 @@ import SignIn from "layouts/authentication/sign-in";
 import User from "layouts/user";
 import Knowledgebase from "layouts/knowledgebase";
 import FAQ from "layouts/faq";
-import DashboardCNO from "layouts_cno/dashboard";
+import PermissionsView from "layouts/permissions";
+import Settings from "layouts/settings";
 
 // Helper functions
 const getUserRole = () => localStorage.getItem("role");
 const isAuthenticated = () => !!localStorage.getItem("authToken");
 const hasAccess = (allowedRoles, role) => isAuthenticated() && allowedRoles.includes(role);
-
 const useRoutes = () => {
-  const [role, setRole] = useState(getUserRole());
+  const [role, setRole] = useState(getUserRole() || ""); // Ensure role is never null
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setRole(getUserRole());
+      setRole(getUserRole() || ""); // Update role on storage changes
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -34,19 +36,60 @@ const useRoutes = () => {
     };
   }, []);
 
+  // If not authenticated, redirect to Sign In
   if (!isAuthenticated()) return [{ route: "/authentication/sign-in", component: <SignIn /> }];
 
-  let roleRoutes = [
-    {
-      type: "collapse",
-      name: "Dashboard",
-      key: "dashboard",
-      icon: <Icon fontSize="small">dashboard</Icon>,
-      route: "/dashboard",
-      component: <Dashboard />,
-    },
-  ];
+  let roleRoutes = [];
 
+  // Default dashboard route
+  let dashboardRoute = {
+    type: "collapse",
+    name: "Dashboard",
+    key: "dashboard",
+    icon: <Icon fontSize="small">dashboard</Icon>,
+    route: "/dashboard",
+    component: <Dashboard />,
+  };
+
+  // Ensure Students and Practitioners route properly
+  if (role === "Admin" || role === "SuperAdmin") {
+    roleRoutes.push(
+      {
+        type: "collapse",
+        name: "Dashboard",
+        key: "dashboard",
+        route: "/dashboard",
+        component: <Dashboard />,
+        icon: <Icon fontSize="small">dashboard</Icon>,
+        children: [
+          {
+            type: "sub-item",
+            name: "Students",
+            key: "dashboard-student",
+            route: "/dashboard/student",
+          },
+          {
+            type: "sub-item",
+            name: "Practitioners",
+            key: "dashboard-practitioner",
+            route: "/dashboard/practitioner",
+          },
+        ],
+      },
+      {
+        route: "/dashboard/student",
+        component: <StudentDashboard />,
+      },
+      {
+        route: "/dashboard/practitioner",
+        component: <PractitionerDashboard />,
+      }
+    );
+  } else {
+    roleRoutes.push(dashboardRoute);
+  }
+
+  // Additional role-based routes
   if (role === "CNO") {
     roleRoutes.push(
       {
@@ -79,7 +122,7 @@ const useRoutes = () => {
     });
   }
 
-  if (role === "Admin") {
+  if (role === "Admin" || role === "SuperAdmin") {
     roleRoutes.push(
       {
         type: "collapse",
@@ -112,6 +155,19 @@ const useRoutes = () => {
         icon: <Icon fontSize="small">notifications</Icon>,
         route: "/faq",
         component: <FAQ />,
+      },
+      {
+        type: "collapse",
+        name: "Settings",
+        key: "setttings",
+        icon: <Icon fontSize="small">settings</Icon>,
+        route: "/settings",
+        component: <Settings />,
+      },
+      {
+        key: "permissions",
+        route: "/permissions",
+        component: <PermissionsView />,
       }
     );
   }
