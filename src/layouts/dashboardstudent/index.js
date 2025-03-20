@@ -42,12 +42,12 @@ function StudentDashboard() {
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard icon="leaderboard" title="Active Checkins" count="230" />
+              <ComplexStatisticsCard icon="leaderboard" title="Active Checkins" count="34,342" />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard icon="leaderboard" title="Inactive Checkins" count="89" />
+              <ComplexStatisticsCard icon="leaderboard" title="Inactive Checkins" count="345" />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
@@ -65,8 +65,8 @@ function StudentDashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="store"
-                title="Active Students"
-                count="3,400"
+                title="Total Students"
+                count="50,000"
               />
             </MDBox>
           </Grid>
@@ -77,7 +77,7 @@ function StudentDashboard() {
                 color="secondary"
                 icon="book"
                 title="Exam Applications"
-                count="978"
+                count="7854"
               />
             </MDBox>
           </Grid>

@@ -9,12 +9,17 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
+import PieChart from "examples/Charts/PieChart";
+
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 
 // Data
 import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
 import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
+import activeInactiveLicensesPieChartData from "layouts/dashboard/data/comparisonPieChart";
+import maleFemaleStudentPieChartData from "layouts/dashboard/data/studentComparisonPieChart";
+
 import licenseRegistrationBarChartData from "layouts/dashboard/data/comparisonBarGraph";
 
 // Dashboard components
@@ -36,12 +41,17 @@ function Dashboard() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard color="dark" icon="people" title="Interns" count={281} />
+              <ComplexStatisticsCard
+                color="dark"
+                icon="people"
+                title="Total practitioners"
+                count={67234}
+              />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard icon="leaderboard" title="Total Checkins" count="230" />
+              <ComplexStatisticsCard icon="leaderboard" title="Total Students" count="136872" />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
@@ -49,8 +59,8 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="store"
-                title="Active Users"
-                count="3,400"
+                title="Pending Licences"
+                count="3,637"
               />
             </MDBox>
           </Grid>
@@ -59,8 +69,8 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="primary"
                 icon="person_add"
-                title="Practitioners"
-                count="+291"
+                title="Facilities"
+                count="2879"
               />
             </MDBox>
           </Grid>
@@ -81,7 +91,7 @@ function Dashboard() {
               <MDBox mb={3}>
                 <ReportsLineChart
                   color="success"
-                  title="Daily Rotations"
+                  title="CPDs"
                   description={
                     <>
                       (<strong>+15%</strong>) increase in today rotations.
@@ -111,6 +121,39 @@ function Dashboard() {
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               {/* <OrdersOverview /> */}
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* Pie Chart for Active vs Inactive Licenses */}
+        <MDBox mt={4.5}>
+          <Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
+                <PieChart
+                  icon={{ component: "pie_chart", color: "info" }}
+                  title="Active vs Inactive Licenses"
+                  description="License Distribution Overview"
+                  height="250px"
+                  chart={activeInactiveLicensesPieChartData}
+                />
+              </MDBox>
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        <MDBox mt={4.5}>
+          <Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
+                <PieChart
+                  icon={{ component: "pie_chart", color: "info" }}
+                  title="Student Distribution"
+                  description=" Student Distribution Overview"
+                  height="250px"
+                  chart={maleFemaleStudentPieChartData}
+                />
+              </MDBox>
             </Grid>
           </Grid>
         </MDBox>

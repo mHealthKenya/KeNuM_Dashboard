@@ -63,6 +63,12 @@ const useRoutes = () => {
         children: [
           {
             type: "sub-item",
+            name: "Main",
+            key: "dashboard",
+            route: "/dashboard",
+          },
+          {
+            type: "sub-item",
             name: "Students",
             key: "dashboard-student",
             route: "/dashboard/student",
