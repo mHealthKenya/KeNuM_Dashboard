@@ -13,21 +13,22 @@ import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 
 // Data
-import reportsBarChartData from "layouts/dashboardpractitioner/data/reportsBarChartData";
-import reportsLineChartData from "layouts/dashboardpractitioner/data/reportsLineChartData";
-import licenseRegistrationBarChartData from "layouts/dashboardpractitioner/data/comparisonBarGraph";
+import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
+import reportsLineChartData from "layouts/dashboardcno/data/reportsLineChartData";
+import licenseRegistrationBarChartData from "layouts/dashboardcno/data/comparisonBarGraph";
 
 // Dashboard components
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
 // Custom Bar Chart Component (fallback)
-import CustomBarChart from "layouts/dashboardpractitioner/data/customBarChart";
-function PractitionerDashboard() {
+import CustomBarChart from "layouts/dashboardcno/data/customBarChart";
+
+function CNODashboard() {
   const { sales, tasks } = reportsLineChartData;
 
   // Debugging: Log the chart data
-  console.log("Practitioner Chart Data:", licenseRegistrationBarChartData);
+  console.log("Student Chart Data:", licenseRegistrationBarChartData);
 
   return (
     <DashboardLayout>
@@ -37,16 +38,36 @@ function PractitionerDashboard() {
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
-                color="dark"
+                color="warning"
                 icon="people"
-                title="Active License"
+                title="Total Nurses"
                 count={281}
               />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard icon="leaderboard" title="Inactive License" count="230" />
+              <ComplexStatisticsCard
+                color="success"
+                icon="people"
+                title="Active Nurses"
+                count="230"
+              />
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                color="error"
+                icon="people"
+                title="Inactive Nurses"
+                count="89"
+              />
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard color="dark" icon="house" title="Facilities" count="278" />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
@@ -54,28 +75,8 @@ function PractitionerDashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="store"
-                title="Active Practitioners"
-                count="30,358"
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="primary"
-                icon="person_add"
-                title="Inactive Practitioners"
-                count="3,076"
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="primary"
-                icon="house"
-                title="Practitioners"
-                count="661"
+                title="Active Checkins"
+                count="3,400"
               />
             </MDBox>
           </Grid>
@@ -83,27 +84,17 @@ function PractitionerDashboard() {
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
-                color="warning"
-                icon="airplane"
-                title="Outmigration Applications"
-                count="2378"
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="dark"
-                icon="person"
-                title="Private Practice Applications"
-                count="1392"
+                color="error"
+                icon="store"
+                title="Inactive Checkins"
+                count="98"
               />
             </MDBox>
           </Grid>
         </Grid>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={4}>
+            {/* <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
                 <ReportsBarChart
                   color="info"
@@ -112,17 +103,12 @@ function PractitionerDashboard() {
                   chart={reportsBarChartData}
                 />
               </MDBox>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
                 <ReportsLineChart
-                  color="warning"
-                  title="CPDs"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today rotations.
-                    </>
-                  }
+                  color="success"
+                  title="Rotations"
                   date="updated 4 min ago"
                   chart={sales}
                 />
@@ -130,12 +116,7 @@ function PractitionerDashboard() {
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
-                <ReportsLineChart
-                  color="dark"
-                  title="Registrations"
-                  description="Last Performance"
-                  chart={tasks}
-                />
+                <ReportsLineChart color="error" title="Transfers" chart={tasks} />
               </MDBox>
             </Grid>
           </Grid>
@@ -152,6 +133,7 @@ function PractitionerDashboard() {
         </MDBox>
 
         {/* Add the combined bar graph here */}
+
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
@@ -168,4 +150,4 @@ function PractitionerDashboard() {
   );
 }
 
-export default PractitionerDashboard;
+export default CNODashboard;
