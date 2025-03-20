@@ -109,11 +109,6 @@ function StudentDashboard() {
                 <ReportsLineChart color="error" title="Transfers" chart={tasks} />
               </MDBox>
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart color="dark" title="Registrations" chart={tasks} />
-              </MDBox>
-            </Grid>
           </Grid>
         </MDBox>
         <MDBox>

@@ -91,6 +91,17 @@ function CNODashboard() {
               />
             </MDBox>
           </Grid>
+
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                color="warning"
+                icon="circle"
+                title="Total Rotations"
+                count="1289"
+              />
+            </MDBox>
+          </Grid>
         </Grid>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
