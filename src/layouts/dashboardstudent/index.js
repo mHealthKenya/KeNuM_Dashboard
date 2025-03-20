@@ -55,7 +55,7 @@ function StudentDashboard() {
               <ComplexStatisticsCard
                 color="primary"
                 icon="person_add"
-                title="Registrationss"
+                title="Registrations"
                 count="278"
               />
             </MDBox>

@@ -75,7 +75,7 @@ function PractitionerDashboard() {
                 color="primary"
                 icon="house"
                 title="Practitioners"
-                count="661"
+                count="40998"
               />
             </MDBox>
           </Grid>
@@ -135,24 +135,9 @@ function PractitionerDashboard() {
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
-                <ReportsBarChart
-                  color="info"
-                  title="License Renewals"
-                  description="Last Renewal Performance"
-                  chart={reportsBarChartData}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
                 <ReportsLineChart
-                  color="warning"
-                  title="CPDs"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today rotations.
-                    </>
-                  }
+                  color="info"
+                  title="License renewals"
                   date="updated 4 min ago"
                   chart={sales}
                 />
@@ -161,11 +146,16 @@ function PractitionerDashboard() {
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
                 <ReportsLineChart
-                  color="dark"
-                  title="Registrations"
-                  description="Last Performance"
-                  chart={tasks}
+                  color="warning"
+                  title="CPDs"
+                  date="updated 4 min ago"
+                  chart={sales}
                 />
+              </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <MDBox mb={3}>
+                <ReportsLineChart color="dark" title="Registrations" chart={tasks} />
               </MDBox>
             </Grid>
           </Grid>
