@@ -79,24 +79,9 @@ function Dashboard() {
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
-                <ReportsBarChart
-                  color="info"
-                  title="License Renewals"
-                  description="Last Renewal Performance"
-                  chart={reportsBarChartData}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
                 <ReportsLineChart
-                  color="success"
-                  title="CPDs"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today rotations.
-                    </>
-                  }
+                  color="warning"
+                  title="License Renewals"
                   date="updated 4 min ago"
                   chart={sales}
                 />
@@ -105,11 +90,16 @@ function Dashboard() {
             <Grid item xs={12} md={6} lg={4}>
               <MDBox mb={3}>
                 <ReportsLineChart
-                  color="dark"
-                  title="Registrations"
-                  description="Last Performance"
-                  chart={tasks}
+                  color="success"
+                  title="CPDs"
+                  date="updated 4 min ago"
+                  chart={sales}
                 />
+              </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <MDBox mb={3}>
+                <ReportsLineChart color="dark" title="Registrations" chart={tasks} />
               </MDBox>
             </Grid>
           </Grid>
