@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Table from "@mui/material/Table";
@@ -9,41 +11,115 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Divider from "@mui/material/Divider";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import CircularProgress from "@mui/material/CircularProgress";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import Footer from "examples/Footer";
-
-const roles = ["Admin", "NCK", "CNO", "Provider", "Facility"];
-const permissions = [
-  "Add User",
-  "Delete User",
-  "Edit User",
-  "Create Event",
-  "Update Event",
-  "Create Supervisor",
-  "Update Supervisor",
-  "Delete Supervisor",
-  "Add Facility",
-  "Update Facility",
-  "Delete Facility",
-];
+import { addRole, getRoles } from "services/roles/rolesService";
+import { addPermission, getPermissions } from "services/permissions/permissionsService";
 
 function Settings() {
-  const [rolePermissions, setRolePermissions] = useState(
-    roles.reduce((acc, role) => {
-      acc[role] = {};
-      permissions.forEach((perm) => (acc[role][perm] = false));
-      return acc;
-    }, {})
-  );
+  const [roles, setRoles] = useState([]);
+  const [permissions, setPermissions] = useState([]);
+  const [rolePermissions, setRolePermissions] = useState({});
+  const [roleName, setRoleName] = useState("");
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [newPermission, setNewPermission] = useState("");
+  const [loading, setLoading] = useState({
+    roles: false,
+    permissions: false,
+    role: false,
+    permission: false,
+  });
+  const [tabValue, setTabValue] = useState(0);
 
-  const handleCheckboxChange = (role, permission) => {
-    setRolePermissions((prev) => ({
-      ...prev,
-      [role]: { ...prev[role], [permission]: !prev[role][permission] },
-    }));
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading((prev) => ({ ...prev, roles: true, permissions: true }));
+
+        // Fetch roles and permissions in parallel
+        const [rolesResponse, permissionsResponse] = await Promise.all([
+          getRoles(),
+          getPermissions(),
+        ]);
+
+        setRoles(rolesResponse.data || rolesResponse);
+        setPermissions(permissionsResponse.data || permissionsResponse);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        alert("Failed to load data");
+      } finally {
+        setLoading((prev) => ({ ...prev, roles: false, permissions: false }));
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
+
+  const handleSaveRole = async () => {
+    if (!roleName.trim()) {
+      alert("Please enter a role name");
+      return;
+    }
+    if (selectedPermissions.length === 0) {
+      alert("Please select at least one permission");
+      return;
+    }
+
+    setLoading((prev) => ({ ...prev, role: true }));
+    try {
+      await addRole({
+        name: roleName,
+        permissions: selectedPermissions,
+      });
+
+      // Refresh roles after adding new one
+      const rolesResponse = await getRoles();
+      setRoles(rolesResponse.data || rolesResponse);
+
+      setRoleName("");
+      setSelectedPermissions([]);
+      alert("Role added successfully!");
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to add role");
+    } finally {
+      setLoading((prev) => ({ ...prev, role: false }));
+    }
+  };
+
+  const handleAddPermission = async () => {
+    if (!newPermission.trim()) {
+      alert("Please enter a permission name");
+      return;
+    }
+
+    setLoading((prev) => ({ ...prev, permission: true }));
+    try {
+      await addPermission({ name: newPermission });
+      const response = await getPermissions();
+      setPermissions(response.data || response);
+      setNewPermission("");
+      alert("Permission added successfully!");
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to add permission");
+    } finally {
+      setLoading((prev) => ({ ...prev, permission: false }));
+    }
   };
 
   return (
@@ -67,78 +143,218 @@ function Settings() {
                   Roles & Permissions
                 </MDTypography>
               </MDBox>
+
+              <MDBox sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs value={tabValue} onChange={handleTabChange}>
+                  <Tab label="Manage Roles/Permissions" />
+                  <Tab label="List" />
+                </Tabs>
+              </MDBox>
+
               <MDBox p={2}>
-                <TableContainer>
-                  <Table sx={{ width: "100%", tableLayout: "fixed" }}>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell
+                {tabValue === 0 ? (
+                  <MDBox>
+                    <MDTypography variant="h6" gutterBottom>
+                      Add New Role
+                    </MDTypography>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                      <InputLabel>Role Name</InputLabel>
+                      <Select
+                        label="Role Name"
+                        value={roleName}
+                        onChange={(e) => setRoleName(e.target.value)}
+                        sx={{
+                          height: 56,
+                          fontSize: 16,
+                          "& .MuiSelect-select": {
+                            padding: "10px 14px",
+                            minHeight: "auto !important",
+                          },
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              maxHeight: 300,
+                              "& .MuiMenuItem-root": {
+                                fontSize: 16,
+                                padding: "8px 16px",
+                              },
+                            },
+                          },
+                        }}
+                      >
+                        {loading.roles ? (
+                          <MenuItem disabled>
+                            <CircularProgress size={24} />
+                          </MenuItem>
+                        ) : (
+                          roles.map((role) => (
+                            <MenuItem
+                              key={role.id || role}
+                              value={role.name || role}
+                              sx={{ fontSize: 16 }}
+                            >
+                              {role.name || role}
+                            </MenuItem>
+                          ))
+                        )}
+                      </Select>
+                    </FormControl>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth sx={{ mb: 3 }}>
+                        <InputLabel>Permissions</InputLabel>
+                        <Select
+                          multiple
+                          label="Permissions"
+                          value={selectedPermissions}
+                          onChange={(e) => setSelectedPermissions(e.target.value)}
+                          renderValue={(selected) => selected.join(", ")}
                           sx={{
-                            fontWeight: "bold",
-                            textAlign: "left",
-                            width: "200px", // Fixed width for Role
-                            p: 2,
+                            height: 56,
+                            fontSize: 16,
+                            "& .MuiSelect-select": {
+                              padding: "10px 14px",
+                              minHeight: "auto !important",
+                            },
+                          }}
+                          MenuProps={{
+                            PaperProps: {
+                              sx: {
+                                maxHeight: 300,
+                                "& .MuiMenuItem-root": {
+                                  fontSize: 16,
+                                  padding: "8px 16px",
+                                },
+                              },
+                            },
                           }}
                         >
-                          Role
-                        </TableCell>
-                        {permissions.map((perm) => (
-                          <TableCell
-                            key={perm}
-                            sx={{
-                              fontWeight: "bold",
-                              textAlign: "center",
-                              width: `${100 / permissions.length}%`, // Adjusted to include Role column
-                              minWidth: "110px", // Prevents collapsing on small screens
-                              p: 2,
-                            }}
-                          >
-                            {perm}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {roles.map((role) => (
-                        <TableRow key={role}>
-                          <TableCell
-                            sx={{
-                              fontWeight: "bold",
-                              textAlign: "left",
-                              width: "200px", // Same width as header
-                              p: 2,
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {role}
-                          </TableCell>
+                          {loading.permissions ? (
+                            <MenuItem disabled>
+                              <CircularProgress size={24} />
+                            </MenuItem>
+                          ) : (
+                            permissions.map((perm) => (
+                              <MenuItem
+                                key={perm.id || perm}
+                                value={perm.name || perm}
+                                sx={{ fontSize: 16 }}
+                              >
+                                <Checkbox
+                                  checked={selectedPermissions.includes(perm.name || perm)}
+                                  sx={{ padding: "4px 8px" }}
+                                />
+                                {perm.name || perm}
+                              </MenuItem>
+                            ))
+                          )}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Button
+                      variant="contained"
+                      onClick={handleSaveRole}
+                      disabled={loading.role}
+                      sx={{ mb: 4 }}
+                    >
+                      {loading.role ? (
+                        <CircularProgress size={24} sx={{ color: "white" }} />
+                      ) : (
+                        <span style={{ color: "white" }}>Save Role</span>
+                      )}
+                    </Button>
 
-                          {permissions.map((perm) => (
-                            <TableCell
-                              key={perm}
-                              sx={{
-                                textAlign: "center",
-                                width: `${100 / permissions.length}%`, // Match header
-                                p: 2,
-                              }}
-                            >
-                              <Checkbox
-                                checked={rolePermissions[role][perm]}
-                                onChange={() => handleCheckboxChange(role, perm)}
-                              />
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                    <Divider sx={{ my: 3 }} />
 
-                <MDBox mt={2} display="flex" justifyContent="flex-end">
-                  <Button variant="contained" color="primary">
-                    <span style={{ color: "white" }}>Save Changes</span>
-                  </Button>
-                </MDBox>
+                    <MDTypography variant="h6" gutterBottom>
+                      Add New Permission
+                    </MDTypography>
+                    <TextField
+                      fullWidth
+                      label="Permission Name"
+                      value={newPermission}
+                      onChange={(e) => setNewPermission(e.target.value)}
+                      sx={{ mb: 2 }}
+                    />
+                    <Button
+                      variant="contained"
+                      onClick={handleAddPermission}
+                      disabled={loading.permission}
+                    >
+                      {loading.permission ? (
+                        <CircularProgress size={24} sx={{ color: "white" }} />
+                      ) : (
+                        <span style={{ color: "white" }}>Add Permission</span>
+                      )}
+                    </Button>
+                  </MDBox>
+                ) : (
+                  <MDBox>
+                    <MDTypography variant="h6" gutterBottom>
+                      Roles
+                    </MDTypography>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: "bold", width: "30%" }}>Role</TableCell>
+                            <TableCell sx={{ fontWeight: "bold" }}>Permissions</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {loading.roles ? (
+                            <TableRow>
+                              <TableCell colSpan={2} align="center">
+                                <CircularProgress />
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            roles.map((role) => (
+                              <TableRow key={role.id || role}>
+                                <TableCell>{role.name || role}</TableCell>
+                                <TableCell>
+                                  {role.permissions
+                                    ? Array.isArray(role.permissions)
+                                      ? role.permissions.join(", ")
+                                      : "No permissions assigned"
+                                    : "No permissions assigned"}
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+
+                    <MDTypography variant="h6" gutterBottom sx={{ mt: 4 }}>
+                      Permissions
+                    </MDTypography>
+                    <TableContainer>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: "bold" }}>Permission</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {loading.permissions ? (
+                            <TableRow>
+                              <TableCell colSpan={1} align="center">
+                                <CircularProgress />
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            permissions.map((perm) => (
+                              <TableRow key={perm.id || perm}>
+                                <TableCell>{perm.name || perm}</TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </MDBox>
+                )}
               </MDBox>
             </Card>
           </Grid>

@@ -41,22 +41,21 @@ function Basic() {
     setLoading(true);
 
     try {
-      // Await the response from AuthService.login
       const response = await AuthService.login(email, password);
 
-      // Ensure response contains necessary data
-      if (!response || !response.token || !response.user.role) {
+      if (!response || !response.token || !response.user.roles?.length) {
         throw new Error("Invalid response from server. Please try again.");
       }
 
-      // Store auth token and role
+      const userRole = response.user.roles[0].name; // Extract role name
+
       localStorage.setItem("authToken", response.token);
-      localStorage.setItem("role", response.user.role);
+      localStorage.setItem("role", userRole);
       localStorage.setItem("userId", response.user.id);
       window.dispatchEvent(new Event("storage"));
 
       // Redirect based on user role
-      switch (response.role) {
+      switch (userRole) {
         case "Admin":
           navigate("/routes");
           break;
@@ -72,46 +71,6 @@ function Basic() {
       setLoading(false);
     }
   };
-
-  // const handleSignIn = async () => {
-  //   setError("");
-  //   setLoading(true);
-
-  //   try {
-  //     // Await the response from AuthService.login
-  //     const response = await AuthService.login(email, password);
-
-  //     // Ensure response contains necessary data
-  //     if (!response || !response.token || !response.user.role) {
-  //       throw new Error("Invalid response from server. Please try again.");
-  //     }
-
-  //     // Store auth token and role
-  //     localStorage.setItem("authToken", response.token);
-  //     localStorage.setItem("role", response.user.role);
-  //     localStorage.setItem("userId", response.user.id);
-  //     window.dispatchEvent(new Event("storage"));
-
-  //     // Confirm the role before redirecting
-  //     const confirmedRole = response.user.role;
-
-  //     // Redirect based on confirmed user role
-  //     switch (confirmedRole) {
-  //       case "Admin":
-  //         navigate("/routes"); // Adjust the route as needed
-  //         break;
-  //       case "CNO":
-  //         navigate("/cno-routes"); // Adjust the route as needed
-  //         break;
-  //       default:
-  //         navigate("/dashboard"); // Default dashboard for other roles
-  //     }
-  //   } catch (err) {
-  //     setError(err.message || "Incorrect email or password. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   return (
     <BasicLayout image={bgImage}>
@@ -133,7 +92,6 @@ function Basic() {
         </MDBox>
         <MDBox pt={4} pb={3} px={3}>
           <MDBox component="form" role="form">
-            {/* Email Input */}
             <MDBox mb={2}>
               <MDInput
                 type="email"
@@ -144,8 +102,6 @@ function Basic() {
                 error={!!error}
               />
             </MDBox>
-
-            {/* Password Input */}
             <MDBox mb={2}>
               <MDInput
                 type={showPassword ? "text" : "password"}
@@ -164,15 +120,12 @@ function Basic() {
                   ),
                 }}
               />
-              {/* Properly spaced error message */}
               {error && (
                 <FormHelperText error sx={{ mt: 1, fontSize: "0.875rem" }}>
                   {error}
                 </FormHelperText>
               )}
             </MDBox>
-
-            {/* Remember Me */}
             <MDBox display="flex" alignItems="center" ml={-1} mb={2}>
               <Switch checked={rememberMe} onChange={handleSetRememberMe} />
               <MDTypography
@@ -185,8 +138,6 @@ function Basic() {
                 &nbsp;&nbsp;Remember me
               </MDTypography>
             </MDBox>
-
-            {/* Sign In Button */}
             <MDBox mt={4} mb={1}>
               <MDButton
                 variant="gradient"
@@ -198,8 +149,6 @@ function Basic() {
                 {loading ? <CircularProgress size={24} color="inherit" /> : "Sign in"}
               </MDButton>
             </MDBox>
-
-            {/* Forgot Password */}
             <MDBox mt={3} mb={1} textAlign="center">
               <MDBox textAlign="left">
                 <MDTypography variant="button" color="text">

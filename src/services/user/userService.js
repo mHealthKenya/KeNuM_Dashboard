@@ -35,11 +35,19 @@ export const getAllUsers = async () => {
 
 export const updateUser = async (id, updatedData) => {
   try {
-    const response = await api.patch(`users/update`, updatedData, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    if (!id) {
+      throw new Error("User ID is missing or invalid.");
+    }
+
+    const response = await api.patch(
+      "users/update",
+      { id, ...updatedData },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
     return response.data;
   } catch (error) {

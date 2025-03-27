@@ -80,7 +80,7 @@ export default function DataTable() {
     l_name: "",
     email: "",
     phone_number: "",
-    role: "",
+    role: [],
   });
 
   // Fetch users on component mount
@@ -101,13 +101,14 @@ export default function DataTable() {
   useEffect(() => {
     if (selectedUser) {
       setFormData({
+        id: String(selectedUser.id),
         f_name: selectedUser.f_name || "",
         l_name: selectedUser.l_name || "",
         email: selectedUser.email || "",
         phone_number: selectedUser.phone_number || "",
-        role: selectedUser.role || "",
+        roles: selectedUser.roles.name || "",
       });
-      setSelectedPermissions(selectedUser.permissions || []); // Initialize permissions
+      // setSelectedPermissions(selectedUser.permissions || []); // Initialize permissions
     }
   }, [selectedUser]);
 
@@ -152,24 +153,55 @@ export default function DataTable() {
   };
 
   // Handle saving edited user details
+  // const handleSaveUser = async () => {
+  //   setLoading(true);
+  //   setError(null); // Clear any previous errors
+
+  //   try {
+  //     // Call the updateUser service
+  //     const updatedUser = await updateUser(selectedUser.id, formData);
+
+  //     // Update the UI state with the updated user data
+  //     setUsers((prevUsers) =>
+  //       prevUsers.map((user) => (user.id === selectedUser.id ? { ...user, ...updatedUser } : user))
+  //     );
+
+  //     // Close the modal
+  //     handleCloseEditModal();
+  //   } catch (error) {
+  //     console.error("Error updating user:", error.message);
+  //     setError(error.message); // Set the error message
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSaveUser = async () => {
-    setLoading(true);
-    setError(null); // Clear any previous errors
-
     try {
-      // Call the updateUser service
-      const updatedUser = await updateUser(selectedUser.id, formData);
+      setLoading(true);
 
-      // Update the UI state with the updated user data
-      setUsers((prevUsers) =>
-        prevUsers.map((user) => (user.id === selectedUser.id ? { ...user, ...updatedUser } : user))
-      );
+      if (!formData.id) {
+        throw new Error("User ID is missing.");
+      }
 
-      // Close the modal
-      handleCloseEditModal();
-    } catch (error) {
-      console.error("Error updating user:", error.message);
-      setError(error.message); // Set the error message
+      console.log("Updating user with ID:", formData.id, "and data:", formData);
+
+      const response = await updateUser(formData.id, {
+        f_name: formData.f_name,
+        l_name: formData.l_name,
+        email: formData.email,
+        phone_number: formData.phone_number,
+        roles: formData.role, // Change this from `role` to `roles`
+      });
+
+      if (response?.success) {
+        handleCloseEditModal();
+      } else {
+        throw new Error(response?.message || "Update failed");
+      }
+    } catch (err) {
+      console.error("Update error:", err);
+      setError(err.message || "Failed to update user. Try again.");
     } finally {
       setLoading(false);
     }
@@ -263,7 +295,9 @@ export default function DataTable() {
       ),
       role: (
         <MDTypography variant="caption" color="text" fontWeight="medium">
-          {user.role}
+          {Array.isArray(user.roles)
+            ? user.roles.map((r) => r.name).join(", ") // Handle multiple roles
+            : user.role?.name ?? user.role ?? "No role"}
         </MDTypography>
       ),
       contact: (
@@ -341,6 +375,7 @@ export default function DataTable() {
                 value={formData.f_name}
                 onChange={handleChange}
                 margin="normal"
+                autoFocus
               />
               <TextField
                 fullWidth
@@ -369,8 +404,8 @@ export default function DataTable() {
               <FormControl fullWidth margin="normal" sx={{ minHeight: 56 }}>
                 <InputLabel>Role</InputLabel>
                 <Select
-                  name="role"
-                  value={formData.role}
+                  name="roles"
+                  value={formData.roles || ""}
                   sx={{ height: 40 }}
                   onChange={handleChange}
                 >
@@ -416,59 +451,5 @@ export default function DataTable() {
     ),
 
     // Modal for setting user permissions
-    permissionsModal: (
-      <Modal open={permissionsModalOpen} onClose={handleClosePermissionsModal}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" mb={2}>
-            Set Permissions for {selectedUser?.f_name} {selectedUser?.l_name}
-          </Typography>
-          {error && (
-            <Typography color="error" mb={2}>
-              {error}
-            </Typography>
-          )}
-          <List>
-            {permissionsList.map((permission) => (
-              <ListItem key={permission.id}>
-                <Checkbox
-                  checked={selectedPermissions.includes(permission.id)}
-                  onChange={() => handlePermissionChange(permission.id)}
-                />
-                <ListItemText primary={permission.name} />
-              </ListItem>
-            ))}
-          </List>
-          <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "red",
-                color: "white",
-                "&:hover": { backgroundColor: "#b71c1c" },
-              }}
-              onClick={handleClosePermissionsModal}
-            >
-              <span style={{ color: "white" }}>Cancel</span>
-            </Button>
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "green",
-                color: "white",
-                "&:hover": { backgroundColor: "#1b5e20" },
-              }}
-              onClick={handleSavePermissions}
-              disabled={loading}
-            >
-              {loading ? (
-                <CircularProgress size={24} sx={{ color: "white" }} />
-              ) : (
-                <span style={{ color: "white" }}>Save</span>
-              )}
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-    ),
   };
 }
