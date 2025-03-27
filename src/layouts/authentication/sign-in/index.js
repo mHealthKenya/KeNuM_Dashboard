@@ -43,11 +43,11 @@ function Basic() {
     try {
       const response = await AuthService.login(email, password);
 
-      if (!response || !response.token || !response.user.role) {
+      if (!response || !response.token || !response.user.roles?.length) {
         throw new Error("Invalid response from server. Please try again.");
       }
 
-      const userRole = response.user.role; // Extract role name
+      const userRole = response.user.roles[0].name; // Extract role name
 
       localStorage.setItem("authToken", response.token);
       localStorage.setItem("role", userRole);

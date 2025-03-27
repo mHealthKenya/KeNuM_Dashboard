@@ -25,19 +25,22 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import Footer from "examples/Footer";
-import { addRole, getRoles } from "services/roles/rolesService";
+import { addRole, getRoles, getRolesWithPermissions } from "services/roles/rolesService";
 import { addPermission, getPermissions } from "services/permissions/permissionsService";
 
 function Settings() {
   const [roles, setRoles] = useState([]);
   const [permissions, setPermissions] = useState([]);
+  const [rolesWithPermissions, setRolesWithPermissions] = useState([]); // New state for roles with permissions
   const [rolePermissions, setRolePermissions] = useState({});
   const [roleName, setRoleName] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [newPermission, setNewPermission] = useState("");
+  const [newRoleName, setNewRoleName] = useState(""); // Added state for new role name
   const [loading, setLoading] = useState({
     roles: false,
     permissions: false,
+    rolesWithPermissions: false, // New loading state
     role: false,
     permission: false,
   });
@@ -46,21 +49,34 @@ function Settings() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading((prev) => ({ ...prev, roles: true, permissions: true }));
+        setLoading((prev) => ({
+          ...prev,
+          roles: true,
+          permissions: true,
+          rolesWithPermissions: true, // Set loading for new data
+        }));
 
         // Fetch roles and permissions in parallel
-        const [rolesResponse, permissionsResponse] = await Promise.all([
-          getRoles(),
-          getPermissions(),
-        ]);
+        const [rolesResponse, permissionsResponse, rolesWithPermissionsResponse] =
+          await Promise.all([
+            getRoles(),
+            getPermissions(),
+            getRolesWithPermissions(), // Fetch roles with permissions
+          ]);
 
         setRoles(rolesResponse.data || rolesResponse);
         setPermissions(permissionsResponse.data || permissionsResponse);
+        setRolesWithPermissions(rolesWithPermissionsResponse || []); // Set the fetched data
       } catch (error) {
         console.error("Failed to fetch data:", error);
         alert("Failed to load data");
       } finally {
-        setLoading((prev) => ({ ...prev, roles: false, permissions: false }));
+        setLoading((prev) => ({
+          ...prev,
+          roles: false,
+          permissions: false,
+          rolesWithPermissions: false,
+        }));
       }
     };
 
@@ -85,12 +101,19 @@ function Settings() {
     try {
       await addRole({
         name: roleName,
-        permissions: selectedPermissions,
+        permissions: selectedPermissions.map((perm) =>
+          typeof perm === "object" && perm.name ? perm.name : perm
+        ),
       });
 
       // Refresh roles after adding new one
-      const rolesResponse = await getRoles();
+      const [rolesResponse, rolesWithPermissionsResponse] = await Promise.all([
+        getRoles(),
+        getRolesWithPermissions(), // Refresh roles with permissions too
+      ]);
+
       setRoles(rolesResponse.data || rolesResponse);
+      setRolesWithPermissions(rolesWithPermissionsResponse || []);
 
       setRoleName("");
       setSelectedPermissions([]);
@@ -119,6 +142,37 @@ function Settings() {
       alert(error.response?.data?.message || "Failed to add permission");
     } finally {
       setLoading((prev) => ({ ...prev, permission: false }));
+    }
+  };
+
+  const handleAddRole = async () => {
+    if (!newRoleName.trim()) {
+      alert("Please enter a role name");
+      return;
+    }
+
+    setLoading((prev) => ({ ...prev, role: true }));
+    try {
+      await addRole({
+        name: newRoleName,
+        permissions: [], // Adding role without permissions initially
+      });
+
+      // Refresh roles after adding new one
+      const [rolesResponse, rolesWithPermissionsResponse] = await Promise.all([
+        getRoles(),
+        getRolesWithPermissions(),
+      ]);
+
+      setRoles(rolesResponse.data || rolesResponse);
+      setRolesWithPermissions(rolesWithPermissionsResponse || []);
+
+      setNewRoleName("");
+      alert("Role added successfully!");
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to add role");
+    } finally {
+      setLoading((prev) => ({ ...prev, role: false }));
     }
   };
 
@@ -155,7 +209,7 @@ function Settings() {
                 {tabValue === 0 ? (
                   <MDBox>
                     <MDTypography variant="h6" gutterBottom>
-                      Add New Role
+                      Manage permissions/Roles
                     </MDTypography>
                     <FormControl fullWidth sx={{ mb: 2 }}>
                       <InputLabel>Role Name</InputLabel>
@@ -287,6 +341,26 @@ function Settings() {
                         <span style={{ color: "white" }}>Add Permission</span>
                       )}
                     </Button>
+
+                    <Divider sx={{ my: 3 }} />
+
+                    <MDTypography variant="h6" gutterBottom>
+                      Add Role
+                    </MDTypography>
+                    <TextField
+                      fullWidth
+                      label="Role Name"
+                      value={newRoleName}
+                      onChange={(e) => setNewRoleName(e.target.value)}
+                      sx={{ mb: 2 }}
+                    />
+                    <Button variant="contained" onClick={handleAddRole} disabled={loading.role}>
+                      {loading.role ? (
+                        <CircularProgress size={24} sx={{ color: "white" }} />
+                      ) : (
+                        <span style={{ color: "white" }}>Add Role</span>
+                      )}
+                    </Button>
                   </MDBox>
                 ) : (
                   <MDBox>
@@ -302,20 +376,24 @@ function Settings() {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {loading.roles ? (
+                          {loading.rolesWithPermissions ? (
                             <TableRow>
                               <TableCell colSpan={2} align="center">
                                 <CircularProgress />
                               </TableCell>
                             </TableRow>
                           ) : (
-                            roles.map((role) => (
+                            rolesWithPermissions.map((role) => (
                               <TableRow key={role.id || role}>
                                 <TableCell>{role.name || role}</TableCell>
                                 <TableCell>
                                   {role.permissions
                                     ? Array.isArray(role.permissions)
-                                      ? role.permissions.join(", ")
+                                      ? role.permissions
+                                          .map((perm) =>
+                                            typeof perm === "object" && perm.name ? perm.name : perm
+                                          )
+                                          .join(", ")
                                       : "No permissions assigned"
                                     : "No permissions assigned"}
                                 </TableCell>
