@@ -314,7 +314,7 @@ function Settings() {
                       {loading.role ? (
                         <CircularProgress size={24} sx={{ color: "white" }} />
                       ) : (
-                        <span style={{ color: "white" }}>Save Role</span>
+                        <span style={{ color: "white" }}>Save Role/Permissons</span>
                       )}
                     </Button>
 
