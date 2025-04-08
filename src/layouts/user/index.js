@@ -1,5 +1,8 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { addUser } from "services/user/userService";
+import { getRoles } from "services/roles/rolesService";
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -10,6 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Alert from "@mui/material/Alert";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -20,17 +24,8 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
-// Role Mapping for API
-const roleMapping = {
-  "NCK Admin": "NCK",
-  "CPD Provider": "Provider",
-  "Internship Coordinator": "CNO",
-  "Facility Supervisor": "CNO",
-  "Rotations Supervisor": "CNO",
-};
-
 function AddUser() {
-  const [isSimpleForm, setIsSimpleForm] = useState(false);
+  const [isNurse, setIsNurse] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,59 +33,64 @@ function AddUser() {
   const [nationalID, setNationalID] = useState("");
   const [role, setRole] = useState("");
   const [gender, setGender] = useState("");
-  const [indexNumber, setIndexNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
+  // State for roles from API
+  const [roles, setRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(false);
+  const [rolesError, setRolesError] = useState("");
+
+  // Fetch roles when component mounts
+  useEffect(() => {
+    const fetchRoles = async () => {
+      setRolesLoading(true);
+      try {
+        const rolesData = await getRoles();
+        setRoles(rolesData);
+        setRolesError("");
+      } catch (err) {
+        console.error("Failed to fetch roles:", err);
+        setRolesError("Failed to load roles. Please try again later.");
+      } finally {
+        setRolesLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
+  // Debug roles data
+  useEffect(() => {
+    if (roles.length > 0) {
+      console.log("Fetched roles:", roles);
+    }
+  }, [roles]);
+
   const handleAddUser = async () => {
-    if (isSimpleForm) {
-      if (!indexNumber || !role) {
-        setMessage({ type: "error", text: "Please fill in all required fields." });
-        return;
-      }
-
-      const newUser = {
-        index_number: indexNumber,
-        role: roleMapping[role],
-      };
-
-      console.log("Submitting Simple Form:", newUser);
-    } else {
-      if (!firstName || !lastName || !email || !phoneNumber || !role || !gender) {
-        setMessage({ type: "error", text: "Please fill in all required fields." });
-        return;
-      }
-
-      const newUser = {
-        national_id: nationalID || null,
-        f_name: firstName,
-        l_name: lastName,
-        email,
-        phone_number: phoneNumber,
-        role: roleMapping[role],
-        gender,
-      };
-
-      console.log("Submitting Full Form:", newUser);
+    if (!firstName || !lastName || !email || !phoneNumber || !role || !gender) {
+      setMessage({ type: "error", text: "Please fill in all required fields." });
+      return;
     }
 
     setLoading(true);
     setMessage({ type: "", text: "" });
 
     try {
-      const response = await addUser(
-        isSimpleForm
-          ? { index_number: indexNumber, role: roleMapping[role] }
-          : {
-              national_id: nationalID || null,
-              f_name: firstName,
-              l_name: lastName,
-              email,
-              phone_number: phoneNumber,
-              role: roleMapping[role],
-              gender,
-            }
-      );
+      const userData = {
+        national_id: nationalID || null,
+        f_name: firstName,
+        l_name: lastName,
+        email,
+        phone_number: phoneNumber,
+        roleId: role, // Send the role ID directly
+        gender,
+        isNurse, // Add isNurse flag
+      };
+
+      console.log("Submitting User Data:", userData);
+
+      const response = await addUser(userData);
 
       console.log("Server Response:", response);
       setMessage({ type: "success", text: "User successfully added!" });
@@ -103,8 +103,9 @@ function AddUser() {
       setNationalID("");
       setRole("");
       setGender("");
-      setIndexNumber("");
+      // Don't reset isNurse to maintain the toggle state
     } catch (err) {
+      console.error("Error adding user:", err);
       setMessage({ type: "error", text: "An error occurred. Please try again." });
     } finally {
       setLoading(false);
@@ -123,8 +124,8 @@ function AddUser() {
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={isSimpleForm}
-                      onChange={() => setIsSimpleForm(!isSimpleForm)}
+                      checked={isNurse}
+                      onChange={() => setIsNurse(!isNurse)}
                       color="primary"
                     />
                   }
@@ -139,123 +140,113 @@ function AddUser() {
                   </Alert>
                 )}
 
+                {rolesError && (
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {rolesError}
+                  </Alert>
+                )}
+
                 <Grid container spacing={2}>
-                  {isSimpleForm ? (
-                    <>
-                      <Grid item xs={12}>
-                        <TextField
-                          label="Index Number *"
-                          fullWidth
-                          value={indexNumber}
-                          onChange={(e) => setIndexNumber(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          select
-                          label="Role *"
-                          fullWidth
-                          value={role}
-                          onChange={(e) => setRole(e.target.value)}
-                          sx={{ height: 56 }} // Increase dropdown size
-                          SelectProps={{
-                            sx: { height: 56, fontSize: 16, padding: "10px" }, // Increase font and padding
-                          }}
-                        >
-                          {Object.keys(roleMapping).map((key) => (
-                            <MenuItem key={key} value={key} sx={{ fontSize: 16 }}>
-                              {key}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      </Grid>
-                    </>
-                  ) : (
-                    <>
-                      <Grid item xs={12}>
-                        <TextField
-                          label="First Name *"
-                          fullWidth
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          label="Last Name *"
-                          fullWidth
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          label="Email *"
-                          type="email"
-                          fullWidth
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          label="Phone Number *"
-                          type="tel"
-                          fullWidth
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          label="National ID (Optional)"
-                          type="tel"
-                          fullWidth
-                          value={nationalID}
-                          onChange={(e) => setNationalID(e.target.value.replace(/\D/g, ""))}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          select
-                          label="Role *"
-                          fullWidth
-                          value={role}
-                          onChange={(e) => setRole(e.target.value)}
-                          sx={{ height: 56 }} // Increase dropdown size
-                          SelectProps={{
-                            sx: { height: 56, fontSize: 16, padding: "10px" }, // Increase font and padding
-                          }}
-                        >
-                          {Object.keys(roleMapping).map((key) => (
-                            <MenuItem key={key} value={key} sx={{ fontSize: 16 }}>
-                              {key}
-                            </MenuItem>
-                          ))}
-                        </TextField>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          select
-                          label="Gender *"
-                          fullWidth
-                          value={gender}
-                          onChange={(e) => setGender(e.target.value)}
-                          sx={{ height: 56 }} // Increase dropdown size
-                          SelectProps={{
-                            sx: { height: 56, fontSize: 16, padding: "10px" }, // Increase font and padding
-                          }}
-                        >
-                          <MenuItem value="Male" sx={{ fontSize: 16 }}>
-                            Male
+                  <Grid item xs={12}>
+                    <TextField
+                      label="First Name *"
+                      fullWidth
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Last Name *"
+                      fullWidth
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Email *"
+                      type="email"
+                      fullWidth
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Phone Number *"
+                      type="tel"
+                      fullWidth
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ""))}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="National ID (Optional)"
+                      type="tel"
+                      fullWidth
+                      value={nationalID}
+                      onChange={(e) => setNationalID(e.target.value.replace(/\D/g, ""))}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      label="Role *"
+                      fullWidth
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      sx={{ height: 56 }}
+                      SelectProps={{
+                        sx: { height: 56, fontSize: 16, padding: "10px" },
+                      }}
+                      disabled={rolesLoading}
+                    >
+                      {rolesLoading ? (
+                        <MenuItem disabled>
+                          <CircularProgress size={20} sx={{ mr: 1 }} />
+                          Loading roles...
+                        </MenuItem>
+                      ) : roles.length > 0 ? (
+                        roles.map((roleOption) => (
+                          <MenuItem
+                            key={roleOption.id || roleOption._id}
+                            value={roleOption.id || roleOption._id}
+                            sx={{ fontSize: 16 }}
+                          >
+                            {roleOption.display_name ||
+                              roleOption.name ||
+                              roleOption.title ||
+                              JSON.stringify(roleOption)}
                           </MenuItem>
-                          <MenuItem value="Female" sx={{ fontSize: 16 }}>
-                            Female
-                          </MenuItem>
-                        </TextField>
-                      </Grid>
-                    </>
-                  )}
+                        ))
+                      ) : (
+                        <MenuItem disabled>No roles available</MenuItem>
+                      )}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      label="Gender *"
+                      fullWidth
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                      sx={{ height: 56 }}
+                      SelectProps={{
+                        sx: { height: 56, fontSize: 16, padding: "10px" },
+                      }}
+                    >
+                      <MenuItem value="Male" sx={{ fontSize: 16 }}>
+                        Male
+                      </MenuItem>
+                      <MenuItem value="Female" sx={{ fontSize: 16 }}>
+                        Female
+                      </MenuItem>
+                    </TextField>
+                  </Grid>
 
                   <Grid item xs={12}>
                     <Button
@@ -263,7 +254,7 @@ function AddUser() {
                       color="primary"
                       onClick={handleAddUser}
                       fullWidth
-                      disabled={loading}
+                      disabled={loading || rolesLoading}
                       style={{ color: "white" }}
                     >
                       {loading ? "Adding..." : "Add User"}

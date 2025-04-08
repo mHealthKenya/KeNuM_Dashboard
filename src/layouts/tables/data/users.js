@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAllUsers, updateUser } from "services/user/userService";
+import { getRoles } from "services/roles/rolesService";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import PropTypes from "prop-types";
@@ -13,14 +14,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Checkbox,
-  List,
-  ListItem,
-  ListItemText,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import CircularProgress from "@mui/material/CircularProgress";
 import { useNavigate } from "react-router-dom";
 
 // Modal Style
@@ -68,6 +66,12 @@ export default function DataTable() {
   const [permissionsModalOpen, setPermissionsModalOpen] = useState(false);
   const [selectedPermissions, setSelectedPermissions] = useState([]);
 
+  // State for roles from API
+  const [roles, setRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(false);
+  const [rolesError, setRolesError] = useState("");
+  const [roleIdRequired, setRoleIdRequired] = useState(false);
+
   const navigate = useNavigate();
 
   const handleOpenPermissionsView = (userId) => {
@@ -80,7 +84,7 @@ export default function DataTable() {
     l_name: "",
     email: "",
     phone_number: "",
-    role: [],
+    roleId: "", // Changed from roles to roleId
   });
 
   // Fetch users on component mount
@@ -88,6 +92,7 @@ export default function DataTable() {
     const fetchUsers = async () => {
       try {
         const usersData = await getAllUsers();
+        console.log("Fetched users:", usersData);
         setUsers(usersData);
       } catch (error) {
         console.error("Error fetching users:", error.message);
@@ -97,20 +102,61 @@ export default function DataTable() {
     fetchUsers();
   }, []);
 
+  // Fetch roles when component mounts
+  useEffect(() => {
+    const fetchRoles = async () => {
+      setRolesLoading(true);
+      try {
+        const rolesData = await getRoles();
+        console.log("Fetched roles:", rolesData);
+        setRoles(rolesData);
+        setRolesError("");
+      } catch (err) {
+        console.error("Failed to fetch roles:", err);
+        setRolesError("Failed to load roles. Please try again later.");
+      } finally {
+        setRolesLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
   // Update formData when selectedUser changes
   useEffect(() => {
     if (selectedUser) {
+      console.log("Selected user for editing:", selectedUser);
+
+      // Determine the roleId from the user's roles
+      let roleId = "";
+
+      if (Array.isArray(selectedUser.roles) && selectedUser.roles.length > 0) {
+        const role = selectedUser.roles[0];
+        roleId = role.id || role._id || "";
+        console.log("Found roleId from roles array:", roleId);
+      } else if (selectedUser.role) {
+        roleId = selectedUser.role.id || selectedUser.role._id || "";
+        console.log("Found roleId from role object:", roleId);
+      }
+
+      // If we still don't have a roleId and we have roles available, use the first one
+      if (!roleId && roles.length > 0) {
+        roleId = roles[0].id || roles[0]._id || "";
+        console.log("Using default roleId from roles list:", roleId);
+      }
+
       setFormData({
         id: String(selectedUser.id),
         f_name: selectedUser.f_name || "",
         l_name: selectedUser.l_name || "",
         email: selectedUser.email || "",
         phone_number: selectedUser.phone_number || "",
-        roles: selectedUser.roles.name || "",
+        roleId: roleId,
       });
-      // setSelectedPermissions(selectedUser.permissions || []); // Initialize permissions
+
+      setRoleIdRequired(false);
     }
-  }, [selectedUser]);
+  }, [selectedUser, roles]);
 
   // Handle opening the edit modal
   const handleOpenEditModal = (user) => {
@@ -118,6 +164,7 @@ export default function DataTable() {
     setSelectedUser(user);
     setEditModalOpen(true);
     setError(null);
+    setRoleIdRequired(false);
   };
 
   // Handle closing the edit modal
@@ -130,71 +177,79 @@ export default function DataTable() {
       l_name: "",
       email: "",
       phone_number: "",
-      role: "",
+      roleId: "",
     });
     setError(null); // Clear any errors
+    setRoleIdRequired(false);
   };
 
   // Handle opening the permissions modal
   const handleOpenPermissionsModal = (user) => {
-    console.log("Opening Permissions Modal for user:", user); // Debug log
+    console.log("Opening Permissions Modal for user:", user);
     setSelectedUser(user);
-    setSelectedPermissions(user.permissions || []); // Initialize permissions
-    setPermissionsModalOpen(true); // Open the modal
-    setEditModalOpen(false); // Close the edit modal if it's open
+    setSelectedPermissions(user.permissions || []);
+    setPermissionsModalOpen(true);
+    setEditModalOpen(false);
   };
 
   // Handle closing the permissions modal
   const handleClosePermissionsModal = () => {
-    console.log("Closing Permissions Modal"); // Debug log
+    console.log("Closing Permissions Modal");
     setPermissionsModalOpen(false);
     setSelectedUser(null);
-    setSelectedPermissions([]); // Reset permissions
+    setSelectedPermissions([]);
   };
 
-  // Handle saving edited user details
-  // const handleSaveUser = async () => {
-  //   setLoading(true);
-  //   setError(null); // Clear any previous errors
-
-  //   try {
-  //     // Call the updateUser service
-  //     const updatedUser = await updateUser(selectedUser.id, formData);
-
-  //     // Update the UI state with the updated user data
-  //     setUsers((prevUsers) =>
-  //       prevUsers.map((user) => (user.id === selectedUser.id ? { ...user, ...updatedUser } : user))
-  //     );
-
-  //     // Close the modal
-  //     handleCloseEditModal();
-  //   } catch (error) {
-  //     console.error("Error updating user:", error.message);
-  //     setError(error.message); // Set the error message
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+  // Update the handleSaveUser function to use the correct format for roles
   const handleSaveUser = async () => {
     try {
+      // Validate role selection
+      if (!formData.roleId) {
+        setRoleIdRequired(true);
+        return;
+      }
+
       setLoading(true);
 
       if (!formData.id) {
         throw new Error("User ID is missing.");
       }
 
-      console.log("Updating user with ID:", formData.id, "and data:", formData);
-
-      const response = await updateUser(formData.id, {
+      // Format the data correctly for the API
+      const userData = {
         f_name: formData.f_name,
         l_name: formData.l_name,
         email: formData.email,
         phone_number: formData.phone_number,
-        roles: formData.role, // Change this from `role` to `roles`
-      });
+        // Use the roles field with the correct format for connecting roles
+        roles: {
+          set: [], // Clear existing roles
+          connect: [{ id: formData.roleId }], // Connect the selected role
+        },
+      };
+
+      console.log("Updating user with ID:", formData.id, "and data:", userData);
+
+      const response = await updateUser(formData.id, userData);
 
       if (response?.success) {
+        // Update the local users state to reflect the changes
+        setUsers((prevUsers) =>
+          prevUsers.map((user) =>
+            user.id === formData.id
+              ? {
+                  ...user,
+                  f_name: formData.f_name,
+                  l_name: formData.l_name,
+                  email: formData.email,
+                  phone_number: formData.phone_number,
+                  // Update the role based on the selected roleId
+                  roles: [roles.find((r) => (r.id || r._id) === formData.roleId) || user.roles[0]],
+                }
+              : user
+          )
+        );
+
         handleCloseEditModal();
       } else {
         throw new Error(response?.message || "Update failed");
@@ -210,24 +265,21 @@ export default function DataTable() {
   // Handle saving user permissions
   const handleSavePermissions = async () => {
     setLoading(true);
-    setError(null); // Clear any previous errors
+    setError(null);
 
     try {
-      // Call the mock updateUserPermissions function
       const updatedUser = await updateUserPermissions(selectedUser.id, selectedPermissions);
 
-      // Update the UI state with the updated user data
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === selectedUser.id ? { ...user, permissions: updatedUser.permissions } : user
         )
       );
 
-      // Close the modal
       handleClosePermissionsModal();
     } catch (error) {
       console.error("Error updating permissions:", error.message);
-      setError(error.message); // Set the error message
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -240,15 +292,19 @@ export default function DataTable() {
       ...prevData,
       [name]: value,
     }));
+
+    // Clear roleId required error when a role is selected
+    if (name === "roleId" && value) {
+      setRoleIdRequired(false);
+    }
   };
 
   // Handle permission checkbox changes
   const handlePermissionChange = (permissionId) => {
-    setSelectedPermissions(
-      (prev) =>
-        prev.includes(permissionId)
-          ? prev.filter((id) => id !== permissionId) // Remove permission
-          : [...prev, permissionId] // Add permission
+    setSelectedPermissions((prev) =>
+      prev.includes(permissionId)
+        ? prev.filter((id) => id !== permissionId)
+        : [...prev, permissionId]
     );
   };
 
@@ -296,7 +352,7 @@ export default function DataTable() {
       role: (
         <MDTypography variant="caption" color="text" fontWeight="medium">
           {Array.isArray(user.roles)
-            ? user.roles.map((r) => r.name).join(", ") // Handle multiple roles
+            ? user.roles.map((r) => r.name || r.display_name || r.title).join(", ")
             : user.role?.name ?? user.role ?? "No role"}
         </MDTypography>
       ),
@@ -315,7 +371,7 @@ export default function DataTable() {
             startIcon={<EditIcon sx={{ color: "#FEFEFE" }} />}
             onClick={() => handleOpenEditModal(user)}
           >
-            {loading ? (
+            {loading && selectedUser?.id === user.id ? (
               <CircularProgress size={24} />
             ) : (
               <span style={{ color: "white" }}>edit</span>
@@ -332,19 +388,6 @@ export default function DataTable() {
           >
             Delete
           </Button>
-
-          {/* Permissions Button */}
-          {/* <Button
-            variant="contained"
-            color="secondary"
-            size="small"
-            startIcon={<EditIcon sx={{ color: "#FEFEFE" }} />}
-            // onClick={() => handleOpenPermissionsModal(user)}
-
-            onClick={() => handleOpenPermissionsView(user.id)}
-          >
-            <span style={{ color: "white" }}>Permissions</span>
-          </Button> */}
         </MDBox>
       ),
     })),
@@ -357,9 +400,14 @@ export default function DataTable() {
             Edit User
           </Typography>
           {error && (
-            <Typography color="error" mb={2}>
+            <Alert severity="error" sx={{ mb: 2 }}>
               {error}
-            </Typography>
+            </Alert>
+          )}
+          {rolesError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {rolesError}
+            </Alert>
           )}
           {selectedUser && (
             <form
@@ -401,19 +449,43 @@ export default function DataTable() {
                 onChange={handleChange}
                 margin="normal"
               />
-              <FormControl fullWidth margin="normal" sx={{ minHeight: 56 }}>
-                <InputLabel>Role</InputLabel>
+              <FormControl fullWidth margin="normal" sx={{ minHeight: 56 }} error={roleIdRequired}>
+                <InputLabel>Role *</InputLabel>
                 <Select
-                  name="roles"
-                  value={formData.roles || ""}
+                  name="roleId"
+                  value={formData.roleId || ""}
                   sx={{ height: 40 }}
                   onChange={handleChange}
+                  disabled={rolesLoading}
+                  required
                 >
-                  <MenuItem value="admin">Admin</MenuItem>
-                  <MenuItem value="user">User</MenuItem>
-                  <MenuItem value="CNO">CNO</MenuItem>
-                  <MenuItem value="Provider">Provider</MenuItem>
+                  {rolesLoading ? (
+                    <MenuItem disabled>
+                      <CircularProgress size={20} sx={{ mr: 1 }} />
+                      Loading roles...
+                    </MenuItem>
+                  ) : roles.length > 0 ? (
+                    roles.map((roleOption) => (
+                      <MenuItem
+                        key={roleOption.id || roleOption._id}
+                        value={roleOption.id || roleOption._id}
+                        sx={{ fontSize: 16 }}
+                      >
+                        {roleOption.display_name ||
+                          roleOption.name ||
+                          roleOption.title ||
+                          JSON.stringify(roleOption)}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No roles available</MenuItem>
+                  )}
                 </Select>
+                {roleIdRequired && (
+                  <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                    Role is required
+                  </Typography>
+                )}
               </FormControl>
               <Box mt={2} display="flex" justifyContent="flex-end" gap={2}>
                 <Button
@@ -435,7 +507,7 @@ export default function DataTable() {
                     color: "white",
                     "&:hover": { backgroundColor: "#1b5e20" },
                   }}
-                  disabled={loading}
+                  disabled={loading || rolesLoading}
                 >
                   {loading ? (
                     <CircularProgress size={24} sx={{ color: "white" }} />
@@ -449,7 +521,5 @@ export default function DataTable() {
         </Box>
       </Modal>
     ),
-
-    // Modal for setting user permissions
   };
 }

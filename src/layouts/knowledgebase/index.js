@@ -42,7 +42,7 @@ function Knowledgebase() {
 
   // Add article form states
   const [newArticleTitle, setNewArticleTitle] = useState("");
-  const [newArticleDescription, setNewArticleDescription] = useState("");
+  // const [newArticleDescription, setNewArticleDescription] = useState("");
   const [newArticleFile, setNewArticleFile] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [success, setSuccess] = useState("");
@@ -131,7 +131,7 @@ function Knowledgebase() {
 
       const newArticle = await addArticle(
         newArticleTitle,
-        newArticleDescription,
+        // newArticleDescription,
         newArticleFile,
         selectedCategory,
         createdById
@@ -145,7 +145,7 @@ function Knowledgebase() {
 
       // Reset form fields
       setNewArticleTitle("");
-      setNewArticleDescription("");
+      // setNewArticleDescription("");
       setNewArticleFile(null);
       setSelectedCategory("");
 
@@ -218,7 +218,7 @@ function Knowledgebase() {
                       )}
                     </Grid>
 
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}> 
                       <TextField
                         label="Article Description"
                         fullWidth
@@ -227,7 +227,7 @@ function Knowledgebase() {
                         value={newArticleDescription}
                         onChange={(e) => setNewArticleDescription(e.target.value)}
                       />
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12}>
                       <FormControl fullWidth sx={{ minHeight: 10 }}>
                         <InputLabel>Category</InputLabel>
@@ -287,9 +287,9 @@ function Knowledgebase() {
                       <Card key={article.id} style={{ marginBottom: "15px" }}>
                         <MDBox p={2}>
                           <MDTypography variant="h6">{article.title}</MDTypography>
-                          <MDTypography variant="body2" color="text">
+                          {/* <MDTypography variant="body2" color="text">
                             {article.description || "No description provided."}
-                          </MDTypography>
+                          </MDTypography> */}
                           <MDBox mt={1} display="flex" justifyContent="flex-end">
                             <IconButton
                               color="primary"

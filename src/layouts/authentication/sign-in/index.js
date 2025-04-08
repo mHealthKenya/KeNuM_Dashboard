@@ -22,7 +22,9 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 // Images
-import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+// import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+
+import bgImage from "assets/images/NCKLogo-0000.jpg";
 
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);

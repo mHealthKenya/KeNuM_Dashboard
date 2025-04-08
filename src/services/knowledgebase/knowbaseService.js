@@ -1,6 +1,6 @@
 import api from "utils/api";
 
-const FILE_BASE_URL = "http://localhost/uploads/";
+// const FILE_BASE_URL = "http://localhost";
 
 // Fetch all knowledge base articles
 export const getAllArticles = async () => {
@@ -11,7 +11,10 @@ export const getAllArticles = async () => {
 
     return response.data.map((article) => ({
       ...article,
-      downloadLink: FILE_BASE_URL + article.file.split("/uploads/").pop(),
+      downloadLink:
+        article.file && article.file.includes("/uploads/")
+          ? article.file.split("/uploads/").pop()
+          : article.file || "unknown-file",
     }));
   } catch (error) {
     throw new Error(error.response?.data?.message || "Failed to fetch articles.");
@@ -19,16 +22,21 @@ export const getAllArticles = async () => {
 };
 
 // Add a new article with category
-export const addArticle = async (title, description, file, categoryId, createdById) => {
+export const addArticle = async (title, files, categoryId, createdById) => {
   try {
-    if (!title || !file || !categoryId || !createdById) {
+    if (!title || !files || !categoryId || !createdById) {
       throw new Error("Missing required fields: title, file, categoryId, or createdById.");
+    }
+
+    const allowedTypes = ["application/pdf"];
+    if (files.type && !allowedTypes.includes(files.type)) {
+      throw new Error("Invalid file type. Please upload a PDF.");
     }
 
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("description", description || ""); // Ensure description is not undefined
-    formData.append("file", file);
+    // formData.append("description", description || ""); // Ensure description is not undefined
+    formData.append("files", files);
     formData.append("categoryId", categoryId);
     formData.append("createdById", createdById);
 
