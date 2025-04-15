@@ -1,6 +1,6 @@
 import api from "utils/api";
 
-// const FILE_BASE_URL = "http://localhost";
+// const FILE_BASE_URL = "https://kenumdashboardapi.estore.africa/";
 
 // Fetch all knowledge base articles
 export const getAllArticles = async () => {

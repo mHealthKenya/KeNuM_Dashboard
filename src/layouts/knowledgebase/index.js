@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -70,7 +72,7 @@ function Knowledgebase() {
     };
 
     fetchData();
-  }, []);
+  }, [success]);
 
   // Handle File Change
   const handleFileChange = (event) => {
@@ -82,7 +84,7 @@ function Knowledgebase() {
   };
 
   const handleAddCategory = async () => {
-    if (!newCategoryTitle) {
+    if (!newCategoryTitle.trim()) {
       setCategoryError("Category title is required.");
       return;
     }
@@ -119,7 +121,7 @@ function Knowledgebase() {
 
   // Handle Adding a New Article
   const handleAddArticle = async () => {
-    if (!newArticleTitle || !newArticleFile || !selectedCategory) {
+    if (!newArticleTitle.trim() || !newArticleFile || !selectedCategory) {
       setError("Please provide a title, file, and select a category.");
       return;
     }
@@ -283,29 +285,37 @@ function Knowledgebase() {
 
                   {!loading &&
                     !error &&
-                    articles.map((article) => (
-                      <Card key={article.id} style={{ marginBottom: "15px" }}>
-                        <MDBox p={2}>
-                          <MDTypography variant="h6">{article.title}</MDTypography>
-                          {/* <MDTypography variant="body2" color="text">
-                            {article.description || "No description provided."}
-                          </MDTypography> */}
-                          <MDBox mt={1} display="flex" justifyContent="flex-end">
-                            <IconButton
-                              color="primary"
-                              component="a"
-                              href={article.downloadLink}
-                              download
-                            >
-                              <DownloadIcon />
-                              <MDTypography variant="body2" color="text">
-                                Download
-                              </MDTypography>
-                            </IconButton>
+                    articles.map((article) => {
+                      // Find the category that matches the article's category ID
+                      const category = categories.find(
+                        (cat) => cat.id === article.knowledgeBaseCategoryId
+                      );
+                      const categoryName = category ? category.title : "Uncategorized";
+
+                      return (
+                        <Card key={article.id} style={{ marginBottom: "15px" }}>
+                          <MDBox p={2}>
+                            <MDTypography variant="h6">{article.title}</MDTypography>
+                            <MDTypography variant="body2" color="text.secondary">
+                              Category: {categoryName}
+                            </MDTypography>
+                            <MDBox mt={1} display="flex" justifyContent="flex-end">
+                              <IconButton
+                                color="primary"
+                                component="a"
+                                href={article.downloadLink}
+                                download
+                              >
+                                <DownloadIcon />
+                                <MDTypography variant="body2" color="text">
+                                  Download
+                                </MDTypography>
+                              </IconButton>
+                            </MDBox>
                           </MDBox>
-                        </MDBox>
-                      </Card>
-                    ))}
+                        </Card>
+                      );
+                    })}
                 </MDBox>
               </Card>
             )}
