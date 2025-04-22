@@ -1,57 +1,116 @@
-// @mui material components
 import Grid from "@mui/material/Grid";
-
-// Material Dashboard 2 React components
+import { useEffect, useState } from "react";
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import PieChart from "examples/Charts/PieChart";
-
-import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 
-// Data
-import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
-import activeInactiveLicensesPieChartData from "layouts/dashboard/data/comparisonPieChart";
-import maleFemaleStudentPieChartData from "layouts/dashboard/data/studentComparisonPieChart";
+// API functions
+import { getIndexed_Students } from "services/analytics/indexed_students";
+import { getMetrics } from "services/analytics/metrics";
+import { formatNumberWithCommas } from "utils/formatNumber";
 
-import licenseRegistrationBarChartData from "layouts/dashboard/data/comparisonBarGraph";
-
-// Dashboard components
-import Projects from "layouts/dashboard/components/Projects";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
-
-// Custom Bar Chart Component (fallback)
-import CustomBarChart from "layouts/dashboard/data/customBarChart";
 function Dashboard() {
-  const { sales, tasks } = reportsLineChartData;
+  const [metrics, setMetrics] = useState(null);
+  const [studentData, setStudentData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Debugging: Log the chart data
-  console.log("Chart Data:", licenseRegistrationBarChartData);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch both datasets in parallel
+        const [metricsResponse, studentsResponse] = await Promise.all([
+          getMetrics(),
+          getIndexed_Students(),
+        ]);
+        console.log("Metrics:", metricsResponse);
+        console.log("Students:", studentsResponse);
+        setMetrics(metricsResponse);
+        setStudentData(studentsResponse.data); // Access nested data property
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+        console.error("Failed to fetch data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <MDBox py={3}>Loading dashboard data...</MDBox>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <MDBox py={3}>Error: {error}</MDBox>
+      </DashboardLayout>
+    );
+  }
+
+  // Process student data for visualizations
+  const processGenderDistribution = () => {
+    if (!studentData) return { female: 0, male: 0, unknown: 0 };
+    const totals = { female: 0, male: 0, unknown: 0 };
+    studentData.forEach((program) => {
+      program.Genders.forEach((gender) => {
+        if (gender.Gender === "F") totals.female += gender.Total;
+        else if (gender.Gender === "M") totals.male += gender.Total;
+        else totals.unknown += gender.Total;
+      });
+    });
+    return totals;
+  };
+
+  const genderData = processGenderDistribution();
+
+  // Pie chart data
+  const genderPieChartData = {
+    labels: ["Female", "Male", "Unknown"],
+    datasets: [
+      {
+        label: "Students by Gender",
+        backgroundColors: ["info", "primary", "dark"],
+        data: [genderData.female, genderData.male, genderData.unknown],
+      },
+    ],
+  };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
+        {/* Top Metrics Cards */}
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="dark"
                 icon="people"
-                title="Total practitioners"
-                count={67234}
+                title="Registered Professionals"
+                count={formatNumberWithCommas(metrics.ever_registered_professionals)}
               />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
-              <ComplexStatisticsCard icon="leaderboard" title="Total Students" count="136872" />
+              <ComplexStatisticsCard
+                icon="leaderboard"
+                title="Indexed Students"
+                count={metrics.indexed_students}
+              />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
@@ -59,8 +118,8 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="success"
                 icon="store"
-                title="Pending Licences"
-                count="3,637"
+                title="Licensed Professionals"
+                count={formatNumberWithCommas(metrics.licensed_professionals)}
               />
             </MDBox>
           </Grid>
@@ -69,92 +128,109 @@ function Dashboard() {
               <ComplexStatisticsCard
                 color="primary"
                 icon="person_add"
-                title="Facilities"
-                count="2879"
+                title="Private Practitioners"
+                count={formatNumberWithCommas(metrics.private_practitioners)}
               />
             </MDBox>
           </Grid>
-        </Grid>
-        <MDBox mt={4.5}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="warning"
-                  title="License Renewals"
-                  date="updated 4 min ago"
-                  chart={sales}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
+          <Grid item xs={12} md={6} lg={3}>
+              <MDBox mb={1.5}>
+                <ComplexStatisticsCard
                   color="success"
-                  title="CPDs"
-                  date="updated 4 min ago"
-                  chart={sales}
+                  icon="school"
+                  title="Active Interns"
+                  count={formatNumberWithCommas(metrics.active_interns)}
                 />
               </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart color="dark" title="Registrations" chart={tasks} />
-              </MDBox>
-            </Grid>
           </Grid>
-        </MDBox>
-        <MDBox>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={8}>
-              {/* <Projects /> */}
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              {/* <OrdersOverview /> */}
-            </Grid>
-          </Grid>
-        </MDBox>
-
-        {/* Pie Chart for Active vs Inactive Licenses */}
-        <MDBox mt={4.5}>
-          <Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
-                <PieChart
-                  icon={{ component: "pie_chart", color: "info" }}
-                  title="Active vs Inactive Licenses"
-                  description="License Distribution Overview"
-                  height="250px"
-                  chart={activeInactiveLicensesPieChartData}
+          <Grid item xs={12} md={6} lg={3}>
+              <MDBox mb={1.5}>
+                <ComplexStatisticsCard
+                  color="warning"
+                  icon="flight"
+                  title="Emigration Applications"
+                  count={formatNumberWithCommas(metrics.emigration_applications)}
                 />
               </MDBox>
-            </Grid>
           </Grid>
-        </MDBox>
+        </Grid>
 
-        <MDBox mt={4.5}>
-          <Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
-                <PieChart
-                  icon={{ component: "pie_chart", color: "info" }}
-                  title="Student Distribution"
-                  description=" Student Distribution Overview"
-                  height="250px"
-                  chart={maleFemaleStudentPieChartData}
-                />
-              </MDBox>
-            </Grid>
-          </Grid>
-        </MDBox>
-
-        {/* Add the combined bar graph here */}
+        {/* Student Data Visualizations */}
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={12} md={6}>
               <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
-                {/* Use CustomBarChart if ReportsBarChart doesn't work */}
-                <CustomBarChart data={licenseRegistrationBarChartData} />
+                <PieChart
+                  icon={{ component: "people", color: "info" }}
+                  title="Student Gender Distribution"
+                  description="Across all programs"
+                  height="300px"
+                  chart={genderPieChartData}
+                />
+              </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
+                <PieChart
+                  icon={{ component: "school", color: "info" }}
+                  title="Program Enrollment Distribution"
+                  description="Top 5 programs by student count"
+                  height="19rem"
+                  chart={{
+                    labels:
+                      studentData
+                        ?.slice(0, 5)
+                        .map((p) => p.Program.length > 20
+                        ? `${p.Program.substring(0, 20)}...` 
+                        : p.Program
+                        ) || [],
+                    datasets: [
+                      {
+                        label: "Students",
+                        backgroundColor: [
+                          "#FF6384", // Pink
+                          "#36A2EB", // Blue
+                          "#FFCE56", // Yellow
+                          "#4BC0C0", // Teal
+                          "#9966FF", // Purple
+                        ],
+                        data: studentData
+                          ?.slice(0, 5)
+                              .map((p) => p.Genders.reduce((sum, g) => sum + g.Total, 0)) 
+                        ||[0, 0, 0, 0, 0],
+                      },
+                    ],
+                  }}
+                  options={{
+                    plugins: {
+                      legend: {
+                        position: "right",
+                        labels: {
+                          padding: 20,
+                          font: {
+                            size: 12,
+                            family: "Roboto",
+                          },
+                          usePointStyle: true,
+                        },
+                      },
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            const label = context.label || "";
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} students (${percentage}%)`;
+                          },
+                        },
+                      },
+                    },
+                    cutout: "60%", // Makes it a donut chart
+                    borderRadius: 5, // Rounded segment edges
+                    spacing: 2, // Space between segments
+                  }}
+                />
               </MDBox>
             </Grid>
           </Grid>
