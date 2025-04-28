@@ -4,9 +4,18 @@ import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import PieChart from "examples/Charts/PieChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Typography,
+} from "@mui/material";
 
 // API functions
 import { getIndexed_Students } from "services/analytics/indexed_students";
@@ -86,6 +95,11 @@ function Dashboard() {
         data: [genderData.female, genderData.male, genderData.unknown],
       },
     ],
+  };
+
+  // Function to calculate total students per program
+  const getTotalStudents = (program) => {
+    return program.Genders.reduce((total, gender) => total + gender.Total, 0);
   };
 
   return (
@@ -231,6 +245,76 @@ function Dashboard() {
                     spacing: 2, // Space between segments
                   }}
                 />
+              </MDBox>
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* Student Data Table */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <MDBox borderRadius="lg" bgColor="grey-100" p={3}>
+                <Typography variant="h6" gutterBottom>
+                  Student Program Distribution Details
+                </Typography>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Program</TableCell>
+                        <TableCell align="right">Female Students</TableCell>
+                        <TableCell align="right">Male Students</TableCell>
+                        <TableCell align="right">Unknown Gender</TableCell>
+                        <TableCell align="right">Total Students</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {studentData?.map((program) => {
+                        const female = program.Genders.find(g => g.Gender === "F")?.Total || 0;
+                        const male = program.Genders.find(g => g.Gender === "M")?.Total || 0;
+                        const unknown = program.Genders.find(g => g.Gender !== "F" && g.Gender !== "M")?.Total || 0;
+                        const total = getTotalStudents(program);
+
+                        return (
+                          <TableRow key={program.Program}>
+                            <TableCell component="th" scope="row">
+                              {program.Program}
+                            </TableCell>
+                            <TableCell align="right">{formatNumberWithCommas(female)}</TableCell>
+                            <TableCell align="right">{formatNumberWithCommas(male)}</TableCell>
+                            <TableCell align="right">{formatNumberWithCommas(unknown)}</TableCell>
+                            <TableCell align="right">{formatNumberWithCommas(total)}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                      {/* Total row */}
+                      {studentData && (
+                        <TableRow>
+                          <TableCell component="th" scope="row">
+                            <strong>Total</strong>
+                          </TableCell>
+                          <TableCell align="right">
+                            <strong>{formatNumberWithCommas(genderData.female)}</strong>
+                          </TableCell>
+                          <TableCell align="right">
+                            <strong>{formatNumberWithCommas(genderData.male)}</strong>
+                          </TableCell>
+                          <TableCell align="right">
+                            <strong>{formatNumberWithCommas(genderData.unknown)}</strong>
+                          </TableCell>
+                          <TableCell align="right">
+                            <strong>
+                              {formatNumberWithCommas(
+                                genderData.female + genderData.male + genderData.unknown
+                              )}
+                            </strong>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </MDBox>
             </Grid>
           </Grid>
