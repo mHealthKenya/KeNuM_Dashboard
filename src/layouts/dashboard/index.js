@@ -271,9 +271,11 @@ function Dashboard() {
                     </TableHead>
                     <TableBody>
                       {studentData?.map((program) => {
-                        const female = program.Genders.find(g => g.Gender === "F")?.Total || 0;
-                        const male = program.Genders.find(g => g.Gender === "M")?.Total || 0;
-                        const unknown = program.Genders.find(g => g.Gender !== "F" && g.Gender !== "M")?.Total || 0;
+                        const female = program.Genders.find((g) => g.Gender === "F")?.Total || 0;
+                        const male = program.Genders.find((g) => g.Gender === "M")?.Total || 0;
+                        const unknown =
+                          program.Genders.find((g) => g.Gender !== "F" && g.Gender !== "M")
+                            ?.Total || 0;
                         const total = getTotalStudents(program);
 
                         return (
