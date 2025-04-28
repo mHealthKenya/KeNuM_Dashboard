@@ -6,6 +6,6 @@ export const getMetrics = async () => {
     console.log("Metrics response:", response.data);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch Metrics.");
+    throw new Error(error.response?.data?.message || "Failed to Fetch Metrics.");
   }
 };
