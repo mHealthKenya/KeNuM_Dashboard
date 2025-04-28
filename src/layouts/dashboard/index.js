@@ -1,3 +1,5 @@
+"use client";
+
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
 import MDBox from "components/MDBox";
@@ -240,7 +242,7 @@ function Dashboard() {
                       },
                       tooltip: {
                         callbacks: {
-                          label: function (context) {
+                          label: (context) => {
                             const label = context.label || "";
                             const value = context.raw || 0;
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -271,7 +273,12 @@ function Dashboard() {
                 <TableContainer component={Paper}>
                   <Table>
                     <TableHead>
-                      <TableRow>
+                      <TableRow
+                        sx={{
+                          backgroundColor: "#E3F2FD",
+                          "& th": { color: "#0D47A1", fontWeight: "bold" },
+                        }}
+                      >
                         <TableCell>Program</TableCell>
                         <TableCell align="right">Female Students</TableCell>
                         <TableCell align="right">Male Students</TableCell>
@@ -280,7 +287,7 @@ function Dashboard() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {studentData?.map((program) => {
+                      {studentData?.map((program, index) => {
                         const female = program.Genders.find((g) => g.Gender === "F")?.Total || 0;
                         const male = program.Genders.find((g) => g.Gender === "M")?.Total || 0;
                         const unknown =
@@ -289,7 +296,14 @@ function Dashboard() {
                         const total = getTotalStudents(program);
 
                         return (
-                          <TableRow key={program.Program}>
+                          <TableRow
+                            key={program.Program}
+                            sx={{
+                              "&:nth-of-type(odd)": { backgroundColor: "#f5f5f5" },
+                              "&:nth-of-type(even)": { backgroundColor: "white" },
+                              "&:hover": { backgroundColor: "#e3f2fd" },
+                            }}
+                          >
                             <TableCell component="th" scope="row">
                               {program.Program}
                             </TableCell>
@@ -302,7 +316,9 @@ function Dashboard() {
                       })}
                       {/* Total row */}
                       {studentData && (
-                        <TableRow>
+                        <TableRow
+                          sx={{ backgroundColor: "#e8eaf6", "& th, & td": { fontWeight: "bold" } }}
+                        >
                           <TableCell component="th" scope="row">
                             <strong>Total</strong>
                           </TableCell>
