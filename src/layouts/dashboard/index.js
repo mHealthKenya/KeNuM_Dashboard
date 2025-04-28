@@ -91,7 +91,7 @@ function Dashboard() {
     datasets: [
       {
         label: "Students by Gender",
-        backgroundColors: ["info", "primary", "dark"],
+        backgroundColor: ["#F946A8", "#2159E4", "#333333"], // Dark pink, blue, dark gray
         data: [genderData.female, genderData.male, genderData.unknown],
       },
     ],
@@ -131,7 +131,7 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="success"
-                icon="store"
+                icon="verified"
                 title="Licensed Professionals"
                 count={formatNumberWithCommas(metrics.licensed_professionals)}
               />
@@ -141,7 +141,7 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="primary"
-                icon="person_add"
+                icon="people_add"
                 title="Private Practitioners"
                 count={formatNumberWithCommas(metrics.private_practitioners)}
               />
@@ -164,6 +164,16 @@ function Dashboard() {
                 icon="flight"
                 title="Emigration Applications"
                 count={formatNumberWithCommas(metrics.emigration_applications)}
+              />
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                color="secondary"
+                icon="verified_outlned"
+                title="Licenced Private Practitioners"
+                count={formatNumberWithCommas(metrics.licenced_private_practitioners)}
               />
             </MDBox>
           </Grid>
