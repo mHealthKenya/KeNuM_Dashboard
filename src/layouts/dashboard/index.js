@@ -134,24 +134,24 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-              <MDBox mb={1.5}>
-                <ComplexStatisticsCard
-                  color="success"
-                  icon="school"
-                  title="Active Interns"
-                  count={formatNumberWithCommas(metrics.active_interns)}
-                />
-              </MDBox>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                color="success"
+                icon="school"
+                title="Active Interns"
+                count={formatNumberWithCommas(metrics.active_interns)}
+              />
+            </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-              <MDBox mb={1.5}>
-                <ComplexStatisticsCard
-                  color="warning"
-                  icon="flight"
-                  title="Emigration Applications"
-                  count={formatNumberWithCommas(metrics.emigration_applications)}
-                />
-              </MDBox>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                color="warning"
+                icon="flight"
+                title="Emigration Applications"
+                count={formatNumberWithCommas(metrics.emigration_applications)}
+              />
+            </MDBox>
           </Grid>
         </Grid>
 
@@ -180,9 +180,8 @@ function Dashboard() {
                     labels:
                       studentData
                         ?.slice(0, 5)
-                        .map((p) => p.Program.length > 20
-                        ? `${p.Program.substring(0, 20)}...` 
-                        : p.Program
+                        .map((p) =>
+                          p.Program.length > 20 ? `${p.Program.substring(0, 20)}...` : p.Program
                         ) || [],
                     datasets: [
                       {
@@ -196,8 +195,9 @@ function Dashboard() {
                         ],
                         data: studentData
                           ?.slice(0, 5)
-                              .map((p) => p.Genders.reduce((sum, g) => sum + g.Total, 0)) 
-                        ||[0, 0, 0, 0, 0],
+                          .map((p) => p.Genders.reduce((sum, g) => sum + g.Total, 0)) || [
+                          0, 0, 0, 0, 0,
+                        ],
                       },
                     ],
                   }}
