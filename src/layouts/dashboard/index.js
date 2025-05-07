@@ -1,3 +1,5 @@
+"use client";
+
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
 import MDBox from "components/MDBox";
@@ -5,6 +7,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import WelcomeBanner from "components/welcomebaner";
 import {
   Table,
   TableBody,
@@ -37,11 +40,11 @@ function Dashboard() {
         ]);
         console.log("Metrics:", metricsResponse);
         console.log("Students:", studentsResponse);
-        setMetrics(metricsResponse);
-        setStudentData(studentsResponse.data); // Access nested data property
+        setMetrics(metricsResponse || {}); // Provide default empty object
+        setStudentData(studentsResponse?.data || []); // Provide default empty array
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        setError(err?.message || "An error occurred");
         setLoading(false);
         console.error("Failed to fetch data:", err);
       }
@@ -68,43 +71,43 @@ function Dashboard() {
     );
   }
 
-  // Process student data for visualizations
+  // Process student data for visualizations with null checks
   const processGenderDistribution = () => {
-    if (!studentData) return { female: 0, male: 0, unknown: 0 };
+    if (!studentData || !Array.isArray(studentData)) return { female: 0, male: 0, unknown: 0 };
     const totals = { female: 0, male: 0, unknown: 0 };
     studentData.forEach((program) => {
-      program.Genders.forEach((gender) => {
-        if (gender.Gender === "F") totals.female += gender.Total;
-        else if (gender.Gender === "M") totals.male += gender.Total;
-        else totals.unknown += gender.Total;
-      });
+      if (program && program.Genders && Array.isArray(program.Genders)) {
+        program.Genders.forEach((gender) => {
+          if (gender) {
+            if (gender.Gender === "F") totals.female += gender.Total || 0;
+            else if (gender.Gender === "M") totals.male += gender.Total || 0;
+            else totals.unknown += gender.Total || 0;
+          }
+        });
+      }
     });
     return totals;
   };
 
   const genderData = processGenderDistribution();
 
-  // Pie chart data
-  const genderPieChartData = {
-    labels: ["Female", "Male", "Unknown"],
-    datasets: [
-      {
-        label: "Students by Gender",
-        backgroundColor: ["#F946A8", "#2159E4", "#333333"], // Dark pink, blue, dark gray
-        data: [genderData.female, genderData.male, genderData.unknown],
-      },
-    ],
+  // Function to calculate total students per program with null checks
+  const getTotalStudents = (program) => {
+    if (!program || !program.Genders || !Array.isArray(program.Genders)) return 0;
+    return program.Genders.reduce((total, gender) => total + (gender?.Total || 0), 0);
   };
 
-  // Function to calculate total students per program
-  const getTotalStudents = (program) => {
-    return program.Genders.reduce((total, gender) => total + gender.Total, 0);
-  };
+  // Ensure metrics is an object to prevent undefined errors
+  const safeMetrics = metrics || {};
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
+        {/* Welcome Banner */}
+        <WelcomeBanner />
+        <br />
+
         {/* Top Metrics Cards */}
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
@@ -113,7 +116,7 @@ function Dashboard() {
                 color="success"
                 icon="school"
                 title="Active Interns"
-                count={formatNumberWithCommas(metrics.active_interns)}
+                count={formatNumberWithCommas(safeMetrics.active_interns || 0)}
               />
             </MDBox>
           </Grid>
@@ -123,7 +126,7 @@ function Dashboard() {
                 color="dark"
                 icon="people"
                 title="Ever Registered Professionals"
-                count={formatNumberWithCommas(metrics.ever_registered_professionals)}
+                count={formatNumberWithCommas(safeMetrics.ever_registered_professionals || 0)}
               />
             </MDBox>
           </Grid>
@@ -133,7 +136,7 @@ function Dashboard() {
                 color="success"
                 icon="verified"
                 title="Licensed Professionals"
-                count={formatNumberWithCommas(metrics.licensed_professionals)}
+                count={formatNumberWithCommas(safeMetrics.licensed_professionals || 0)}
               />
             </MDBox>
           </Grid>
@@ -143,7 +146,7 @@ function Dashboard() {
                 color="secondary"
                 icon="verified_outlned"
                 title="Licenced Private Practitioners"
-                count={formatNumberWithCommas(metrics.licenced_private_practitioners)}
+                count={formatNumberWithCommas(safeMetrics.licenced_private_practitioners || 0)}
               />
             </MDBox>
           </Grid>
@@ -154,7 +157,7 @@ function Dashboard() {
                 color="primary"
                 icon="people_add"
                 title="Private Practitioners"
-                count={formatNumberWithCommas(metrics.private_practitioners)}
+                count={formatNumberWithCommas(safeMetrics.private_practitioners || 0)}
               />
             </MDBox>
           </Grid>
@@ -165,7 +168,7 @@ function Dashboard() {
                 color="warning"
                 icon="flight"
                 title="Emigration Applications"
-                count={formatNumberWithCommas(metrics.emigration_applications)}
+                count={formatNumberWithCommas(safeMetrics.emigration_applications || 0)}
               />
             </MDBox>
           </Grid>
@@ -174,92 +177,11 @@ function Dashboard() {
               <ComplexStatisticsCard
                 icon="flight"
                 title="Licenced Private Practitioners"
-                count={formatNumberWithCommas(metrics.licensed_private_practitioners)}
+                count={formatNumberWithCommas(safeMetrics.licensed_private_practitioners || 0)}
               />
             </MDBox>
           </Grid>
         </Grid>
-
-        {/* Student Data Visualizations */}
-        {/* <MDBox mt={4.5}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
-                <PieChart
-                  icon={{ component: "people", color: "info" }}
-                  title="Student Gender Distribution"
-                  description="Across all programs"
-                  height="300px"
-                  chart={genderPieChartData}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
-                <PieChart
-                  icon={{ component: "school", color: "info" }}
-                  title="Program Enrollment Distribution"
-                  description="Top 5 programs by student count"
-                  height="19rem"
-                  chart={{
-                    labels:
-                      studentData
-                        ?.slice(0, 5)
-                        .map((p) =>
-                          p.Program.length > 20 ? `${p.Program.substring(0, 20)}...` : p.Program
-                        ) || [],
-                    datasets: [
-                      {
-                        label: "Students",
-                        backgroundColor: [
-                          "#FF6384", // Pink
-                          "#36A2EB", // Blue
-                          "#FFCE56", // Yellow
-                          "#4BC0C0", // Teal
-                          "#9966FF", // Purple
-                        ],
-                        data: studentData
-                          ?.slice(0, 5)
-                          .map((p) => p.Genders.reduce((sum, g) => sum + g.Total, 0)) || [
-                          0, 0, 0, 0, 0,
-                        ],
-                      },
-                    ],
-                  }}
-                  options={{
-                    plugins: {
-                      legend: {
-                        position: "right",
-                        labels: {
-                          padding: 20,
-                          font: {
-                            size: 12,
-                            family: "Roboto",
-                          },
-                          usePointStyle: true,
-                        },
-                      },
-                      tooltip: {
-                        callbacks: {
-                          label: (context) => {
-                            const label = context.label || "";
-                            const value = context.raw || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = Math.round((value / total) * 100);
-                            return `${label}: ${value} students (${percentage}%)`;
-                          },
-                        },
-                      },
-                    },
-                    cutout: "60%", // Makes it a donut chart
-                    borderRadius: 5, // Rounded segment edges
-                    spacing: 2, // Space between segments
-                  }}
-                />
-              </MDBox>
-            </Grid>
-          </Grid> 
-        </MDBox> */}
 
         {/* Student Data Table */}
         <MDBox mt={4}>
@@ -287,27 +209,29 @@ function Dashboard() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {studentData?.map((program, index) => {
-                        const total = getTotalStudents(program);
+                      {Array.isArray(studentData) &&
+                        studentData.map((program, index) => {
+                          if (!program) return null;
+                          const total = getTotalStudents(program);
 
-                        return (
-                          <TableRow
-                            key={program.Program}
-                            sx={{
-                              "&:nth-of-type(odd)": { backgroundColor: "#f5f5f5" },
-                              "&:nth-of-type(even)": { backgroundColor: "white" },
-                              "&:hover": { backgroundColor: "#e3f2fd" },
-                            }}
-                          >
-                            <TableCell component="th" scope="row">
-                              {program.Program}
-                            </TableCell>
-                            <TableCell align="right">{formatNumberWithCommas(total)}</TableCell>
-                          </TableRow>
-                        );
-                      })}
+                          return (
+                            <TableRow
+                              key={program.Program || index}
+                              sx={{
+                                "&:nth-of-type(odd)": { backgroundColor: "#f5f5f5" },
+                                "&:nth-of-type(even)": { backgroundColor: "white" },
+                                "&:hover": { backgroundColor: "#e3f2fd" },
+                              }}
+                            >
+                              <TableCell component="th" scope="row">
+                                {program.Program || "Unknown Program"}
+                              </TableCell>
+                              <TableCell align="right">{formatNumberWithCommas(total)}</TableCell>
+                            </TableRow>
+                          );
+                        })}
                       {/* Total row */}
-                      {studentData && (
+                      {Array.isArray(studentData) && studentData.length > 0 && (
                         <TableRow
                           sx={{ backgroundColor: "#e8eaf6", "& th, & td": { fontWeight: "bold" } }}
                         >
