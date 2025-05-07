@@ -170,14 +170,13 @@ function Dashboard() {
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
-              <MDBox mb={1.5}>
-                <ComplexStatisticsCard
-                  
-                  icon="flight"
-                  title="Licenced Private Practitioners"
-                  count={formatNumberWithCommas(metrics.licensed_private_practitioners)}
-                />
-              </MDBox>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
+                icon="flight"
+                title="Licenced Private Practitioners"
+                count={formatNumberWithCommas(metrics.licensed_private_practitioners)}
+              />
+            </MDBox>
           </Grid>
         </Grid>
 
@@ -259,7 +258,7 @@ function Dashboard() {
                 />
               </MDBox>
             </Grid>
-          </Grid>
+          </Grid> 
         </MDBox> */}
 
         {/* Student Data Table */}
