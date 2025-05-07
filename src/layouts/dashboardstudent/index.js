@@ -435,6 +435,224 @@ function StudentDashboard() {
             </Grid>
           </MDBox>
         </MDBox>
+        <MDBox mt={4.5}>
+          {/* Training Information Section Header */}
+          <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              sx={{ fontWeight: "bold", color: "primary.main" }}
+            >
+              Training & Internship Overview
+            </Typography>
+
+            {/* First Row - Internship and Rotation Stats */}
+            <Grid container spacing={3} mt={2}>
+              {/* Internship Status - Full width on mobile, half on medium+ */}
+              <Grid item xs={12} md={6}>
+                <MDBox p={3} borderRadius="lg" bgcolor="white" boxShadow={1} height="100%">
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: "medium" }}>
+                    Internship Status Distribution
+                  </Typography>
+                  <PieChart
+                    height="300px"
+                    chart={{
+                      labels: ["Active", "Completed", "Terminated"],
+                      datasets: [
+                        {
+                          data: [1250, 980, 45],
+                          backgroundColor: ["#4CAF50", "#2196F3", "#F44336"],
+                          borderWidth: 2,
+                        },
+                      ],
+                    }}
+                    options={{
+                      plugins: {
+                        legend: {
+                          position: "right",
+                          labels: {
+                            font: {
+                              size: 14,
+                            },
+                            padding: 20,
+                          },
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: (context) => {
+                              const total = context.dataset.data.reduce((a, b) => a + b);
+                              const percentage = Math.round((context.raw / total) * 100);
+                              return `${context.label}: ${context.raw} interns (${percentage}%)`;
+                            },
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+
+              {/* Rotation Distribution */}
+              <Grid item xs={12} md={6}>
+                <MDBox p={3} borderRadius="lg" bgcolor="white" boxShadow={1} height="100%">
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: "medium" }}>
+                    Rotation Specialties
+                  </Typography>
+                  <PieChart
+                    height="300px"
+                    chart={{
+                      labels: ["Medical", "Surgical", "Community", "Specialty"],
+                      datasets: [
+                        {
+                          data: [650, 580, 420, 300],
+                          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
+                          borderWidth: 2,
+                        },
+                      ],
+                    }}
+                    options={{
+                      plugins: {
+                        legend: {
+                          position: "right",
+                          labels: {
+                            font: {
+                              size: 14,
+                            },
+                          },
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: (context) => {
+                              return `${context.label}: ${context.raw} students`;
+                            },
+                          },
+                        },
+                      },
+                      cutout: "50%", // Makes it a donut chart
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+            </Grid>
+
+            {/* Second Row - Transfers and Institutions */}
+            <Grid container spacing={3} mt={0}>
+              {/* Transfer Requests */}
+              <Grid item xs={12} md={6}>
+                <MDBox p={3} borderRadius="lg" bgcolor="white" boxShadow={1} height="100%">
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: "medium" }}>
+                    Transfer Request Status
+                  </Typography>
+                  <PieChart
+                    height="300px"
+                    chart={{
+                      labels: ["Approved", "Pending", "Rejected"],
+                      datasets: [
+                        {
+                          data: [320, 150, 42],
+                          backgroundColor: [
+                            "#4CAF50", // Green for approved
+                            "#FFC107", // Amber for pending
+                            "#F44336", // Red for rejected
+                          ],
+                          borderWidth: 2,
+                          borderColor: "#ffffff",
+                        },
+                      ],
+                    }}
+                    options={{
+                      plugins: {
+                        legend: {
+                          position: "right",
+                          labels: {
+                            font: {
+                              size: 14,
+                              weight: "500",
+                            },
+                            padding: 20,
+                            usePointStyle: true,
+                          },
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: (context) => {
+                              const total = context.dataset.data.reduce((a, b) => a + b);
+                              const percentage = Math.round((context.raw / total) * 100);
+                              return `${context.label}: ${context.raw} requests (${percentage}%)`;
+                            },
+                          },
+                        },
+                      },
+                      cutout: "50%", // Makes it a donut chart
+                      maintainAspectRatio: false,
+                    }}
+                  />
+                </MDBox>
+              </Grid>
+
+              {/* Training Institutions */}
+              <Grid item xs={12} md={6}>
+                <MDBox p={3} borderRadius="lg" bgcolor="white" boxShadow={1} height="100%">
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: "medium" }}>
+                    Top Training Institutions
+                  </Typography>
+                  <TableContainer component={Paper} sx={{ maxHeight: 300 }}>
+                    <Table size="medium">
+                      <TableBody>
+                        {/* Header Row - now inside TableBody but styled as header */}
+                        <TableRow
+                          sx={{
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 1,
+                            backgroundColor: "#E3F2FD",
+                            "& th": {
+                              fontWeight: "bold",
+                              color: "#0D47A1",
+                            },
+                          }}
+                        >
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            sx={{ width: "70%", textAlign: "left" }}
+                          >
+                            Institution
+                          </TableCell>
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            sx={{ width: "30%", textAlign: "right" }}
+                          >
+                            Students
+                          </TableCell>
+                        </TableRow>
+
+                        {/* Data Rows */}
+                        {[
+                          { name: "National Referral Hospital", students: 450 },
+                          { name: "County Teaching Hospital", students: 320 },
+                          { name: "University Medical Center", students: 280 },
+                          { name: "Private Specialist Hospital", students: 150 },
+                          { name: "Regional General Hospital", students: 120 },
+                        ].map((row) => (
+                          <TableRow key={row.name} hover>
+                            <TableCell sx={{ width: "70%", textAlign: "left" }}>
+                              {row.name}
+                            </TableCell>
+                            <TableCell sx={{ width: "30%", textAlign: "right" }}>
+                              {formatNumberWithCommas(row.students)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </MDBox>
+              </Grid>
+            </Grid>
+          </MDBox>
+        </MDBox>
         <MDBox>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={8}>
