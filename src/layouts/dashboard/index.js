@@ -113,6 +113,15 @@ function Dashboard() {
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
+                icon="leaderboard"
+                title="Indexed Students"
+                count={metrics.indexed_students}
+              />
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
                 color="success"
                 icon="school"
                 title="Active Interns"
@@ -172,15 +181,6 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                icon="flight"
-                title="Licenced Private Practitioners"
-                count={formatNumberWithCommas(safeMetrics.licensed_private_practitioners || 0)}
-              />
-            </MDBox>
-          </Grid>
         </Grid>
 
         {/* Student Data Table */}
@@ -193,22 +193,38 @@ function Dashboard() {
                 </Typography>
                 <TableContainer component={Paper}>
                   <Table>
-                    <TableHead>
+                    <TableBody>
+                      {/* Header Row - now part of TableBody */}
                       <TableRow
                         sx={{
                           backgroundColor: "#E3F2FD",
-                          "& th": { color: "#0D47A1", fontWeight: "bold" },
+                          "& th": {
+                            color: "#0D47A1",
+                            fontWeight: "bold",
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 1,
+                            backgroundColor: "#E3F2FD",
+                          },
                         }}
                       >
-                        <TableCell width="60%" align="left">
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ width: "60%", textAlign: "left" }}
+                        >
                           Program
                         </TableCell>
-                        <TableCell width="40%" align="right">
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          sx={{ width: "40%", textAlign: "right" }}
+                        >
                           Total Students
                         </TableCell>
                       </TableRow>
-                    </TableHead>
-                    <TableBody>
+
+                      {/* Data Rows */}
                       {Array.isArray(studentData) &&
                         studentData.map((program, index) => {
                           if (!program) return null;
@@ -218,27 +234,39 @@ function Dashboard() {
                             <TableRow
                               key={program.Program || index}
                               sx={{
-                                "&:nth-of-type(odd)": { backgroundColor: "#f5f5f5" },
-                                "&:nth-of-type(even)": { backgroundColor: "white" },
+                                "&:nth-of-type(even)": { backgroundColor: "#f5f5f5" },
+                                "&:nth-of-type(odd)": { backgroundColor: "white" },
                                 "&:hover": { backgroundColor: "#e3f2fd" },
                               }}
                             >
-                              <TableCell component="th" scope="row">
+                              <TableCell component="td" sx={{ width: "60%", textAlign: "left" }}>
                                 {program.Program || "Unknown Program"}
                               </TableCell>
-                              <TableCell align="right">{formatNumberWithCommas(total)}</TableCell>
+                              <TableCell sx={{ width: "40%", textAlign: "right" }}>
+                                {formatNumberWithCommas(total)}
+                              </TableCell>
                             </TableRow>
                           );
                         })}
+
                       {/* Total row */}
                       {Array.isArray(studentData) && studentData.length > 0 && (
                         <TableRow
-                          sx={{ backgroundColor: "#e8eaf6", "& th, & td": { fontWeight: "bold" } }}
+                          sx={{
+                            backgroundColor: "#e8eaf6",
+                            "& th, & td": {
+                              fontWeight: "bold",
+                              position: "sticky",
+                              bottom: 0,
+                              backgroundColor: "#e8eaf6",
+                              zIndex: 1,
+                            },
+                          }}
                         >
-                          <TableCell component="th" scope="row">
+                          <TableCell component="th" scope="row" sx={{ width: "60%" }}>
                             <strong>Total</strong>
                           </TableCell>
-                          <TableCell align="right">
+                          <TableCell sx={{ width: "40%", textAlign: "right" }}>
                             <strong>
                               {formatNumberWithCommas(
                                 genderData.female + genderData.male + genderData.unknown

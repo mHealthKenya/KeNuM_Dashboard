@@ -1,5 +1,5 @@
-// Separate datasets for registration and license
-export const registrationData = {
+// Updated data file showing only license data
+const licenseBarChartData = {
   labels: [
     "January",
     "February",
@@ -14,39 +14,15 @@ export const registrationData = {
     "November",
     "December",
   ],
-  datasets: {
-    label: "Registrations",
-    data: [120, 190, 130, 170, 160, 150, 180, 170, 160, 190, 200, 210],
-    backgroundColor: "rgba(54, 162, 235, 0.5)",
-  },
-};
-
-export const licenseData = {
-  labels: [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+  datasets: [
+    {
+      label: "Licenses Issued",
+      data: [90, 120, 100, 140, 130, 110, 150, 140, 130, 160, 170, 180],
+      backgroundColor: "rgba(75, 192, 192, 0.6)",
+      borderColor: "rgba(75, 192, 192, 1)",
+      borderWidth: 1,
+    },
   ],
-  datasets: {
-    label: "Licenses",
-    data: [90, 120, 100, 140, 130, 110, 150, 140, 130, 160, 170, 180],
-    backgroundColor: "rgba(255, 99, 132, 0.5)",
-  },
 };
 
-// For backward compatibility
-const licenseRegistrationBarChartData = {
-  labels: registrationData.labels,
-  datasets: [registrationData.datasets, licenseData.datasets],
-};
-
-export default licenseRegistrationBarChartData;
+export default licenseBarChartData;

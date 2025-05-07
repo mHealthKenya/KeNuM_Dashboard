@@ -9,7 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import PropTypes from "prop-types"; // Import PropTypes
+import PropTypes from "prop-types";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -22,7 +22,7 @@ const options = {
     },
     title: {
       display: true,
-      text: "Registrations vs Licenses",
+      text: "Licenses over the Year",
     },
   },
 };
