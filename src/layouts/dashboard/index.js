@@ -1,12 +1,9 @@
-"use client";
-
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import PieChart from "examples/Charts/PieChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import {
   Table,
@@ -113,19 +110,20 @@ function Dashboard() {
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
-                color="dark"
-                icon="people"
-                title="Registered Professionals"
-                count={formatNumberWithCommas(metrics.ever_registered_professionals)}
+                color="success"
+                icon="school"
+                title="Active Interns"
+                count={formatNumberWithCommas(metrics.active_interns)}
               />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Indexed Students"
-                count={metrics.indexed_students}
+                color="dark"
+                icon="people"
+                title="Ever Registered Professionals"
+                count={formatNumberWithCommas(metrics.ever_registered_professionals)}
               />
             </MDBox>
           </Grid>
@@ -142,6 +140,17 @@ function Dashboard() {
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
+                color="secondary"
+                icon="verified_outlned"
+                title="Licenced Private Practitioners"
+                count={formatNumberWithCommas(metrics.licenced_private_practitioners)}
+              />
+            </MDBox>
+          </Grid>
+
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
                 color="primary"
                 icon="people_add"
                 title="Private Practitioners"
@@ -149,16 +158,7 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="success"
-                icon="school"
-                title="Active Interns"
-                count={formatNumberWithCommas(metrics.active_interns)}
-              />
-            </MDBox>
-          </Grid>
+
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
@@ -169,20 +169,10 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="secondary"
-                icon="verified_outlned"
-                title="Licenced Private Practitioners"
-                count={formatNumberWithCommas(metrics.licenced_private_practitioners)}
-              />
-            </MDBox>
-          </Grid>
         </Grid>
 
         {/* Student Data Visualizations */}
-        <MDBox mt={4.5}>
+        {/* <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
@@ -260,7 +250,7 @@ function Dashboard() {
               </MDBox>
             </Grid>
           </Grid>
-        </MDBox>
+        </MDBox> */}
 
         {/* Student Data Table */}
         <MDBox mt={4}>
@@ -279,20 +269,16 @@ function Dashboard() {
                           "& th": { color: "#0D47A1", fontWeight: "bold" },
                         }}
                       >
-                        <TableCell>Program</TableCell>
-                        <TableCell align="right">Female Students</TableCell>
-                        <TableCell align="right">Male Students</TableCell>
-                        <TableCell align="right">Unknown Gender</TableCell>
-                        <TableCell align="right">Total Students</TableCell>
+                        <TableCell width="60%" align="left">
+                          Program
+                        </TableCell>
+                        <TableCell width="40%" align="right">
+                          Total Students
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {studentData?.map((program, index) => {
-                        const female = program.Genders.find((g) => g.Gender === "F")?.Total || 0;
-                        const male = program.Genders.find((g) => g.Gender === "M")?.Total || 0;
-                        const unknown =
-                          program.Genders.find((g) => g.Gender !== "F" && g.Gender !== "M")
-                            ?.Total || 0;
                         const total = getTotalStudents(program);
 
                         return (
@@ -307,9 +293,6 @@ function Dashboard() {
                             <TableCell component="th" scope="row">
                               {program.Program}
                             </TableCell>
-                            <TableCell align="right">{formatNumberWithCommas(female)}</TableCell>
-                            <TableCell align="right">{formatNumberWithCommas(male)}</TableCell>
-                            <TableCell align="right">{formatNumberWithCommas(unknown)}</TableCell>
                             <TableCell align="right">{formatNumberWithCommas(total)}</TableCell>
                           </TableRow>
                         );
@@ -321,15 +304,6 @@ function Dashboard() {
                         >
                           <TableCell component="th" scope="row">
                             <strong>Total</strong>
-                          </TableCell>
-                          <TableCell align="right">
-                            <strong>{formatNumberWithCommas(genderData.female)}</strong>
-                          </TableCell>
-                          <TableCell align="right">
-                            <strong>{formatNumberWithCommas(genderData.male)}</strong>
-                          </TableCell>
-                          <TableCell align="right">
-                            <strong>{formatNumberWithCommas(genderData.unknown)}</strong>
                           </TableCell>
                           <TableCell align="right">
                             <strong>

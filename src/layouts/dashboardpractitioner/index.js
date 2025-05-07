@@ -1,5 +1,6 @@
 // @mui material components
 import Grid from "@mui/material/Grid";
+import { useEffect, useState } from "react";
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -23,8 +24,57 @@ import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
 // Custom Bar Chart Component (fallback)
 import CustomBarChart from "layouts/dashboardpractitioner/data/customBarChart";
+import { getMetrics } from "services/analytics/metrics";
+import { getIndexed_Students } from "services/analytics/indexed_students";
+
+import { formatNumberWithCommas } from "utils/formatNumber";
+
 function PractitionerDashboard() {
   const { sales, tasks } = reportsLineChartData;
+  const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch both datasets in parallel
+        const [metricsResponse, studentsResponse] = await Promise.all([
+          getMetrics(),
+          // getIndexed_Students(),
+        ]);
+        console.log("Metrics:", metricsResponse);
+        console.log("Students:", studentsResponse);
+        setMetrics(metricsResponse);
+        // setStudentData(studentsResponse.data); // Access nested data property
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+        console.error("Failed to fetch data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <MDBox py={3}>Loading dashboard data...</MDBox>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <MDBox py={3}>Error: {error}</MDBox>
+      </DashboardLayout>
+    );
+  }
 
   // Debugging: Log the chart data
   console.log("Practitioner Chart Data:", licenseRegistrationBarChartData);
@@ -37,10 +87,20 @@ function PractitionerDashboard() {
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
+                color="success"
+                icon="verified"
+                title="Active License"
+                count={formatNumberWithCommas(metrics.licensed_professionals)}
+              />
+            </MDBox>
+          </Grid>
+          <Grid item xs={12} md={6} lg={3}>
+            <MDBox mb={1.5}>
+              <ComplexStatisticsCard
                 color="dark"
                 icon="people"
-                title="Active License"
-                count={281}
+                title="Ever Registered Professionals"
+                count={formatNumberWithCommas(metrics.ever_registered_professionals)}
               />
             </MDBox>
           </Grid>
@@ -131,6 +191,7 @@ function PractitionerDashboard() {
             </MDBox>
           </Grid>
         </Grid>
+
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>

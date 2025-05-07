@@ -13,7 +13,8 @@ import Events from "layouts/events";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import User from "layouts/user";
-import Knowledgebase from "layouts/knowledgebase";
+import KnowledgebaseAdd from "layouts/knowledgebase/index";
+import KnowledgebaseView from "layouts/knowledgebase/view";
 import FAQ from "layouts/faq";
 import PermissionsView from "layouts/permissions";
 import Settings from "layouts/settings";
@@ -69,7 +70,7 @@ const useRoutes = () => {
           },
           {
             type: "sub-item",
-            name: "Students",
+            name: "Training",
             key: "dashboard-student",
             route: "/dashboard/student",
           },
@@ -162,7 +163,26 @@ const useRoutes = () => {
         key: "knowledgebase",
         icon: <Icon fontSize="small">book</Icon>,
         route: "/knowledgebase",
-        component: <Knowledgebase />,
+        component: <KnowledgebaseAdd />,
+        children: [
+          {
+            type: "sub-item",
+            name: "Add Article",
+            key: "knowledgebase-add",
+            route: "/knowledgebase",
+          },
+          {
+            type: "sub-item",
+            name: "View Articles",
+            key: "knowledgebase-view",
+            route: "/knowledgebase/view",
+          },
+        ],
+      },
+      {
+        key: "knowledgebase-view",
+        route: "/knowledgebase/view",
+        component: <KnowledgebaseView />,
       },
       {
         type: "collapse",
