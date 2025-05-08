@@ -15,6 +15,8 @@ import SignIn from "layouts/authentication/sign-in";
 import User from "layouts/user";
 import KnowledgebaseAdd from "layouts/knowledgebase/index";
 import KnowledgebaseView from "layouts/knowledgebase/view";
+import FAQView from "layouts/faq/view";
+
 import FAQ from "layouts/faq";
 import PermissionsView from "layouts/permissions";
 import Settings from "layouts/settings";
@@ -191,6 +193,25 @@ const useRoutes = () => {
         icon: <Icon fontSize="small">notifications</Icon>,
         route: "/faq",
         component: <FAQ />,
+        children: [
+          {
+            type: "sub-item",
+            name: "Add FAQ",
+            key: "faq-add",
+            route: "/faq",
+          },
+          {
+            type: "sub-item",
+            name: "View FAQs",
+            key: "faq-view",
+            route: "/faq/view",
+          },
+        ],
+      },
+      {
+        key: "faq-view",
+        route: "/faq/view",
+        component: <FAQView />,
       },
       {
         type: "collapse",
