@@ -25,7 +25,12 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import Footer from "examples/Footer";
-import { addRole, getRoles, getRolesWithPermissions } from "services/roles/rolesService";
+import {
+  addRole,
+  getRoles,
+  getRolesWithPermissions,
+  updateRole,
+} from "services/roles/rolesService";
 import { addPermission, getPermissions } from "services/permissions/permissionsService";
 
 function Settings() {
@@ -34,7 +39,7 @@ function Settings() {
   const [rolesWithPermissions, setRolesWithPermissions] = useState([]); // New state for roles with permissions
   const [rolePermissions, setRolePermissions] = useState({});
   const [roleName, setRoleName] = useState("");
-  const [selectedPermissions, setSelectedPermissions] = useState([]);
+  const [selectedPermissions, setSelectedPermissions] = useState([]); // Initialize with empty array for multi-select
   const [newPermission, setNewPermission] = useState("");
   const [newRoleName, setNewRoleName] = useState(""); // Added state for new role name
   const [loading, setLoading] = useState({
@@ -92,24 +97,59 @@ function Settings() {
       alert("Please enter a role name");
       return;
     }
+
     if (selectedPermissions.length === 0) {
       alert("Please select at least one permission");
       return;
     }
 
+    console.log("Available roles:", rolesWithPermissions);
+
+    // Handle if rolesWithPermissions is undefined or not an array
+    if (!Array.isArray(rolesWithPermissions)) {
+      console.error("RolesWithPermissions is not an array:", rolesWithPermissions);
+      alert("Error: Could not load roles. Please try again.");
+      return;
+    }
+
+    // Find the role by name
+    const existingRole = rolesWithPermissions.find(
+      (role) => role.name?.toLowerCase() === roleName.trim().toLowerCase()
+    );
+
+    if (!existingRole) {
+      alert("Role not found. Please enter an existing role name.");
+      return;
+    }
+
     setLoading((prev) => ({ ...prev, role: true }));
     try {
-      await addRole({
-        name: roleName,
-        permissions: selectedPermissions.map((perm) =>
-          typeof perm === "object" && perm.name ? perm.name : perm
-        ),
+      console.log("Debug - selectedPermissions:", {
+        value: selectedPermissions,
+        type: typeof selectedPermissions,
+        isArray: Array.isArray(selectedPermissions),
+        length: selectedPermissions?.length,
       });
+
+      // Ensure selectedPermissions is an array
+      if (!Array.isArray(selectedPermissions)) {
+        console.error("selectedPermissions is not an array");
+        alert("Error: Invalid permissions format");
+        return;
+      }
+
+      // Update the role's permissions with simple array of IDs
+      const updateData = {
+        name: roleName,
+        permissions: selectedPermissions,
+      };
+      console.log("Sending update with:", updateData);
+      await updateRole(existingRole.id, updateData);
 
       // Refresh roles after adding new one
       const [rolesResponse, rolesWithPermissionsResponse] = await Promise.all([
         getRoles(),
-        getRolesWithPermissions(), // Refresh roles with permissions too
+        getRolesWithPermissions(),
       ]);
 
       setRoles(rolesResponse.data || rolesResponse);
@@ -117,9 +157,10 @@ function Settings() {
 
       setRoleName("");
       setSelectedPermissions([]);
-      alert("Role added successfully!");
+      alert("Role Permissions updated successfully!");
     } catch (error) {
-      alert(error.response?.data?.message || "Failed to add role");
+      console.error("Error in handleSaveRole:", error);
+      alert(error.message || "Failed to update role permissions.");
     } finally {
       setLoading((prev) => ({ ...prev, role: false }));
     }
@@ -261,8 +302,16 @@ function Settings() {
                           multiple
                           label="Permissions"
                           value={selectedPermissions}
-                          onChange={(e) => setSelectedPermissions(e.target.value)}
-                          renderValue={(selected) => selected.join(", ")}
+                          onChange={(e) => {
+                            const newValue = e.target.value;
+                            console.log("Select onChange:", { newValue });
+                            setSelectedPermissions(Array.isArray(newValue) ? newValue : []);
+                          }}
+                          renderValue={(selected) =>
+                            selected
+                              .map((id) => permissions.find((p) => p.id === id)?.name || id)
+                              .join(", ")
+                          }
                           sx={{
                             height: 56,
                             fontSize: 16,
@@ -289,16 +338,12 @@ function Settings() {
                             </MenuItem>
                           ) : (
                             permissions.map((perm) => (
-                              <MenuItem
-                                key={perm.id || perm}
-                                value={perm.name || perm}
-                                sx={{ fontSize: 16 }}
-                              >
+                              <MenuItem key={perm.id} value={perm.id} sx={{ fontSize: 16 }}>
                                 <Checkbox
-                                  checked={selectedPermissions.includes(perm.name || perm)}
+                                  checked={selectedPermissions.includes(perm.id)}
                                   sx={{ padding: "4px 8px" }}
                                 />
-                                {perm.name || perm}
+                                {perm.name}
                               </MenuItem>
                             ))
                           )}
