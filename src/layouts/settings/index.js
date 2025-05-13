@@ -366,6 +366,26 @@ function Settings() {
                     <Divider sx={{ my: 3 }} />
 
                     <MDTypography variant="h6" gutterBottom>
+                      Add Role
+                    </MDTypography>
+                    <TextField
+                      fullWidth
+                      label="Role Name"
+                      value={newRoleName}
+                      onChange={(e) => setNewRoleName(e.target.value)}
+                      sx={{ mb: 2 }}
+                    />
+                    <Button variant="contained" onClick={handleAddRole} disabled={loading.role}>
+                      {loading.role ? (
+                        <CircularProgress size={24} sx={{ color: "white" }} />
+                      ) : (
+                        <span style={{ color: "white" }}>Add Role</span>
+                      )}
+                    </Button>
+
+                    <Divider sx={{ my: 3 }} />
+
+                    <MDTypography variant="h6" gutterBottom>
                       Add New Permission
                     </MDTypography>
                     <TextField
@@ -387,7 +407,7 @@ function Settings() {
                       )}
                     </Button>
 
-                    <Divider sx={{ my: 3 }} />
+                    {/* <Divider sx={{ my: 3 }} />
 
                     <MDTypography variant="h6" gutterBottom>
                       Add Role
@@ -405,21 +425,15 @@ function Settings() {
                       ) : (
                         <span style={{ color: "white" }}>Add Role</span>
                       )}
-                    </Button>
+                    </Button> */}
                   </MDBox>
                 ) : (
                   <MDBox>
                     <MDTypography variant="h6" gutterBottom>
-                      Roles
+                      Roles to Permissions
                     </MDTypography>
                     <TableContainer>
                       <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: "bold", width: "30%" }}>Role</TableCell>
-                            <TableCell sx={{ fontWeight: "bold" }}>Permissions</TableCell>
-                          </TableRow>
-                        </TableHead>
                         <TableBody>
                           {loading.rolesWithPermissions ? (
                             <TableRow>
@@ -428,22 +442,32 @@ function Settings() {
                               </TableCell>
                             </TableRow>
                           ) : (
-                            rolesWithPermissions.map((role) => (
-                              <TableRow key={role.id || role}>
-                                <TableCell>{role.name || role}</TableCell>
-                                <TableCell>
-                                  {role.permissions
-                                    ? Array.isArray(role.permissions)
-                                      ? role.permissions
-                                          .map((perm) =>
-                                            typeof perm === "object" && perm.name ? perm.name : perm
-                                          )
-                                          .join(", ")
-                                      : "No permissions assigned"
-                                    : "No permissions assigned"}
+                            <>
+                              <TableRow>
+                                <TableCell sx={{ fontWeight: "bold", width: "30%" }}>
+                                  Role
                                 </TableCell>
+                                <TableCell sx={{ fontWeight: "bold" }}>Permissions</TableCell>
                               </TableRow>
-                            ))
+                              {rolesWithPermissions.map((role) => (
+                                <TableRow key={role.id || role}>
+                                  <TableCell>{role.name || role}</TableCell>
+                                  <TableCell>
+                                    {role.permissions
+                                      ? Array.isArray(role.permissions)
+                                        ? role.permissions
+                                            .map((perm) =>
+                                              typeof perm === "object" && perm.name
+                                                ? perm.name
+                                                : perm
+                                            )
+                                            .join(", ")
+                                        : "No permissions assigned"
+                                      : "No permissions assigned"}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </>
                           )}
                         </TableBody>
                       </Table>
