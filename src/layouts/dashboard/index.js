@@ -17,6 +17,7 @@ import {
   TableRow,
   Paper,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 
 // API functions
@@ -57,7 +58,9 @@ function Dashboard() {
     return (
       <DashboardLayout>
         <DashboardNavbar />
-        <MDBox py={3}>Loading dashboard data...</MDBox>
+        <MDBox py={3} display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <CircularProgress color="info" size={60} />
+        </MDBox>{" "}
       </DashboardLayout>
     );
   }

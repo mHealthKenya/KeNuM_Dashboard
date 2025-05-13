@@ -28,6 +28,7 @@ import { getMetrics } from "services/analytics/metrics";
 import { getIndexed_Students } from "services/analytics/indexed_students";
 
 import { formatNumberWithCommas } from "utils/formatNumber";
+import { CircularProgress } from "@mui/material";
 
 function PractitionerDashboard() {
   const { sales, tasks } = reportsLineChartData;
@@ -62,7 +63,9 @@ function PractitionerDashboard() {
     return (
       <DashboardLayout>
         <DashboardNavbar />
-        <MDBox py={3}>Loading dashboard data...</MDBox>
+        <MDBox py={3} display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <CircularProgress color="info" size={60} />
+        </MDBox>{" "}
       </DashboardLayout>
     );
   }
