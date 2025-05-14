@@ -1,3 +1,5 @@
+"use client";
+
 // @mui material components
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
@@ -9,26 +11,17 @@ import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-
-// Data
-import reportsBarChartData from "layouts/dashboardpractitioner/data/reportsBarChartData";
 import reportsLineChartData from "layouts/dashboardpractitioner/data/reportsLineChartData";
 import licenseRegistrationBarChartData from "layouts/dashboardpractitioner/data/comparisonBarGraph";
-
-// Dashboard components
-import Projects from "layouts/dashboard/components/Projects";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
 // Custom Bar Chart Component (fallback)
 import CustomBarChart from "layouts/dashboardpractitioner/data/customBarChart";
 import { getMetrics } from "services/analytics/metrics";
-import { getIndexed_Students } from "services/analytics/indexed_students";
 
 import { formatNumberWithCommas } from "utils/formatNumber";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Typography } from "@mui/material";
 
 function PractitionerDashboard() {
   const { sales, tasks } = reportsLineChartData;
@@ -86,6 +79,25 @@ function PractitionerDashboard() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
+        {/* Date and Time Section */}
+        <MDBox mb={2} display="flex" justifyContent="flex-end">
+          <Typography variant="body2" color="text.secondary">
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}{" "}
+            -{" "}
+            {new Date().toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </Typography>
+        </MDBox>
+        <br />
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
