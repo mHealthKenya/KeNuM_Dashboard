@@ -13,7 +13,6 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   Paper,
   Typography,
@@ -107,6 +106,23 @@ function Dashboard() {
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
+        {/* Date and Time Section */}
+        <MDBox mb={2} display="flex" justifyContent="flex-end">
+          <Typography variant="body2" color="text.secondary">
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}{" "}
+            -{" "}
+            {new Date().toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </Typography>
+        </MDBox>
         {/* Welcome Banner */}
         <WelcomeBanner />
         <br />
