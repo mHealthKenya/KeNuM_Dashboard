@@ -16,6 +16,9 @@ import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import ExamApplicationsBarGraph from "./data/examApplicationBar.js";
 import InternshipApplicationsBarGraph from "./data/internshipApplicationsBar.js";
+import InternshipPostingsTable from "./data/internshipPostingsTable.js";
+import ExamResultsBarGraph from "./data/examResultsBar.js";
+
 import {
   Table,
   TableBody,
@@ -43,7 +46,9 @@ import { getMetrics } from "services/analytics/metrics";
 import { formatNumberWithCommas } from "utils/formatNumber";
 import {
   getExamApplicationMetrics,
+  getExamResultsMetrics,
   getInternshipApplicationMetrics,
+  getInternshipPostingsMetrics,
 } from "services/analytics/metrics";
 
 function StudentDashboard() {
@@ -54,18 +59,28 @@ function StudentDashboard() {
   const [error, setError] = useState(null);
   const [examData, setExamData] = useState(null);
   const [internshipData, setInternshipData] = useState(null);
+  const [examResultsData, setExamResultsData] = useState(null);
+  const [internshipPostingsData, setInternshipPostingsData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch both datasets in parallel
-        const [metricsResponse, studentsResponse, examResponse, internshipResponse] =
-          await Promise.all([
-            getMetrics(),
-            getIndexed_Students(),
-            getExamApplicationMetrics(),
-            getInternshipApplicationMetrics(),
-          ]);
+        const [
+          metricsResponse,
+          studentsResponse,
+          examResponse,
+          internshipResponse,
+          examResultsResponse,
+          internshipPostingsResponse,
+        ] = await Promise.all([
+          getMetrics(),
+          getIndexed_Students(),
+          getExamApplicationMetrics(),
+          getInternshipApplicationMetrics(),
+          getExamResultsMetrics(),
+          getInternshipPostingsMetrics(),
+        ]);
         console.log("Metrics:", metricsResponse);
         console.log("Students:", studentsResponse);
         console.log("Exam Applications:", examResponse);
@@ -75,6 +90,8 @@ function StudentDashboard() {
         setStudentData(studentsResponse.data); // Access nested data property
         setExamData(examResponse || null);
         setInternshipData(internshipResponse || null);
+        setExamResultsData(examResultsResponse || null);
+        setInternshipPostingsData(internshipPostingsResponse || null);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -709,6 +726,23 @@ function StudentDashboard() {
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               {/* <OrdersOverview /> */}
+            </Grid>
+          </Grid>
+        </MDBox>
+        {/* Exam Results Chart */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <ExamResultsBarGraph data={examResultsData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* Internship Postings Table */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <InternshipPostingsTable data={internshipPostingsData} />
             </Grid>
           </Grid>
         </MDBox>
