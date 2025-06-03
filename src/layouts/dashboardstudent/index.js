@@ -14,12 +14,13 @@ import PieChart from "examples/Charts/PieChart";
 import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import ExamApplicationsBarGraph from "./data/examApplicationBar.js";
+import InternshipApplicationsBarGraph from "./data/internshipApplicationsBar.js";
 import {
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   TableRow,
   Paper,
   Typography,
@@ -40,6 +41,10 @@ import CustomBarChart from "layouts/dashboardstudent/data/customBarChart";
 import { getIndexed_Students } from "services/analytics/indexed_students";
 import { getMetrics } from "services/analytics/metrics";
 import { formatNumberWithCommas } from "utils/formatNumber";
+import {
+  getExamApplicationMetrics,
+  getInternshipApplicationMetrics,
+} from "services/analytics/metrics";
 
 function StudentDashboard() {
   const { sales, tasks } = reportsLineChartData;
@@ -47,19 +52,29 @@ function StudentDashboard() {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [examData, setExamData] = useState(null);
+  const [internshipData, setInternshipData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch both datasets in parallel
-        const [metricsResponse, studentsResponse] = await Promise.all([
-          getMetrics(),
-          getIndexed_Students(),
-        ]);
+        const [metricsResponse, studentsResponse, examResponse, internshipResponse] =
+          await Promise.all([
+            getMetrics(),
+            getIndexed_Students(),
+            getExamApplicationMetrics(),
+            getInternshipApplicationMetrics(),
+          ]);
         console.log("Metrics:", metricsResponse);
         console.log("Students:", studentsResponse);
+        console.log("Exam Applications:", examResponse);
+        console.log("Internship Applications:", internshipResponse);
+
         setMetrics(metricsResponse);
         setStudentData(studentsResponse.data); // Access nested data property
+        setExamData(examResponse || null);
+        setInternshipData(internshipResponse || null);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -350,6 +365,20 @@ function StudentDashboard() {
                     }}
                   />
                 </MDBox>
+              </Grid>
+            </Grid>
+          </MDBox>
+
+          <MDBox mt={4}>
+            <Grid container spacing={3}>
+              {/* Exam Applications Chart */}
+              <Grid item xs={12} lg={6}>
+                <ExamApplicationsBarGraph data={examData} />
+              </Grid>
+
+              {/* Internship Applications Chart */}
+              <Grid item xs={12} lg={6}>
+                <InternshipApplicationsBarGraph data={internshipData} />
               </Grid>
             </Grid>
           </MDBox>
@@ -686,16 +715,15 @@ function StudentDashboard() {
 
         {/* Add the combined bar graph here */}
 
-        <MDBox mt={4.5}>
+        {/* <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
-                {/* Use CustomBarChart if ReportsBarChart doesn't work */}
                 <CustomBarChart data={licenseRegistrationBarChartData} />
               </MDBox>
             </Grid>
           </Grid>
-        </MDBox>
+        </MDBox> */}
       </MDBox>
       <Footer />
     </DashboardLayout>

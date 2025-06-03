@@ -8,6 +8,10 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import WelcomeBanner from "components/welcomebaner";
+import ExamApplicationsBarGraph from "./data/examApplicationBar.js";
+import InternshipApplicationsBarGraph from "./data/internshipApplicationsBar.js";
+import ExamResultsBarGraph from "./data/examResultsBar.js";
+import InternshipPostingsTable from "./data/internshipPostingsTable.js";
 import {
   Table,
   TableBody,
@@ -22,26 +26,57 @@ import {
 // API functions
 import { getIndexed_Students } from "services/analytics/indexed_students";
 import { getMetrics } from "services/analytics/metrics";
+import {
+  getExamApplicationMetrics,
+  getExamResultsMetrics,
+  getInternshipApplicationMetrics,
+  getInternshipPostingsMetrics,
+} from "services/analytics/metrics";
 import { formatNumberWithCommas } from "utils/formatNumber";
 
 function Dashboard() {
   const [metrics, setMetrics] = useState(null);
   const [studentData, setStudentData] = useState(null);
+  const [examData, setExamData] = useState(null);
+  const [internshipData, setInternshipData] = useState(null);
+  const [examResultsData, setExamResultsData] = useState(null);
+  const [internshipPostingsData, setInternshipPostingsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch both datasets in parallel
-        const [metricsResponse, studentsResponse] = await Promise.all([
+        // Fetch all datasets in parallel
+        const [
+          metricsResponse,
+          studentsResponse,
+          examResponse,
+          internshipResponse,
+          examResultsResponse,
+          internshipPostingsResponse,
+        ] = await Promise.all([
           getMetrics(),
           getIndexed_Students(),
+          getExamApplicationMetrics(),
+          getInternshipApplicationMetrics(),
+          getExamResultsMetrics(),
+          getInternshipPostingsMetrics(),
         ]);
+
         console.log("Metrics:", metricsResponse);
         console.log("Students:", studentsResponse);
-        setMetrics(metricsResponse || {}); // Provide default empty object
-        setStudentData(studentsResponse?.data || []); // Provide default empty array
+        console.log("Exam Applications:", examResponse);
+        console.log("Internship Applications:", internshipResponse);
+        console.log("Exam Results:", examResultsResponse);
+        console.log("Internship Postings:", internshipPostingsResponse);
+
+        setMetrics(metricsResponse || {});
+        setStudentData(studentsResponse?.data || []);
+        setExamData(examResponse || null);
+        setInternshipData(internshipResponse || null);
+        setExamResultsData(examResultsResponse || null);
+        setInternshipPostingsData(internshipPostingsResponse || null);
         setLoading(false);
       } catch (err) {
         setError(err?.message || "An error occurred");
@@ -59,7 +94,7 @@ function Dashboard() {
         <DashboardNavbar />
         <MDBox py={3} display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
           <CircularProgress color="info" size={60} />
-        </MDBox>{" "}
+        </MDBox>
       </DashboardLayout>
     );
   }
@@ -123,6 +158,7 @@ function Dashboard() {
             })}
           </Typography>
         </MDBox>
+
         {/* Welcome Banner */}
         <WelcomeBanner />
         <br />
@@ -178,7 +214,6 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
-
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
@@ -189,7 +224,6 @@ function Dashboard() {
               />
             </MDBox>
           </Grid>
-
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
@@ -202,6 +236,39 @@ function Dashboard() {
           </Grid>
         </Grid>
 
+        {/* Charts Section */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            {/* Exam Applications Chart */}
+            <Grid item xs={12} lg={6}>
+              <ExamApplicationsBarGraph data={examData} />
+            </Grid>
+
+            {/* Internship Applications Chart */}
+            <Grid item xs={12} lg={6}>
+              <InternshipApplicationsBarGraph data={internshipData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* Exam Results Chart */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <ExamResultsBarGraph data={examResultsData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* Internship Postings Table */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <InternshipPostingsTable data={internshipPostingsData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
         {/* Student Data Table */}
         <MDBox mt={4}>
           <Grid container spacing={3}>
@@ -213,7 +280,7 @@ function Dashboard() {
                 <TableContainer component={Paper}>
                   <Table>
                     <TableBody>
-                      {/* Header Row - now part of TableBody */}
+                      {/* Header Row */}
                       <TableRow
                         sx={{
                           backgroundColor: "#E3F2FD",
