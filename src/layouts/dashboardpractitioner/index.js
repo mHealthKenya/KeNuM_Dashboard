@@ -1,13 +1,6 @@
-"use client";
-
-// @mui material components
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
-
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
@@ -16,30 +9,42 @@ import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatist
 import reportsLineChartData from "layouts/dashboardpractitioner/data/reportsLineChartData";
 import licenseRegistrationBarChartData from "layouts/dashboardpractitioner/data/comparisonBarGraph";
 
-// Custom Bar Chart Component (fallback)
-import CustomBarChart from "layouts/dashboardpractitioner/data/customBarChart";
-import { getMetrics } from "services/analytics/metrics";
+import {
+  getMetrics,
+  getRegistrationMetrics,
+  getRetentionMetrics,
+} from "services/analytics/metrics";
 
 import { formatNumberWithCommas } from "utils/formatNumber";
 import { CircularProgress, Typography } from "@mui/material";
+import RegistrationBarGraph from "./data/registrationBarGraph.js";
+import RetentionBarGraph from "./data/retentionBarGraph.js";
 
 function PractitionerDashboard() {
   const { sales, tasks } = reportsLineChartData;
   const [metrics, setMetrics] = useState(null);
+  const [registrationData, setRegistrationData] = useState(null);
+  const [retentionData, setRetentionData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch both datasets in parallel
-        const [metricsResponse, studentsResponse] = await Promise.all([
+        // Fetch  datasets in parallel
+        const [metricsResponse, registrationResponse, retentionResponse] = await Promise.all([
           getMetrics(),
-          // getIndexed_Students(),
+          getRegistrationMetrics(),
+          getRetentionMetrics(),
         ]);
         console.log("Metrics:", metricsResponse);
-        console.log("Students:", studentsResponse);
+        console.log("Registration Data:", registrationResponse);
+        console.log("Retention Data:", retentionResponse);
+
         setMetrics(metricsResponse);
+        setRegistrationData(registrationResponse || null);
+        setRetentionData(retentionResponse || null);
+
         // setStudentData(studentsResponse.data); // Access nested data property
         setLoading(false);
       } catch (err) {
@@ -247,8 +252,26 @@ function PractitionerDashboard() {
           </Grid>
         </MDBox>
 
+        {/* Registration Data Chart */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <RegistrationBarGraph data={registrationData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* Retention Data Chart */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <RetentionBarGraph data={retentionData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
         {/* Add the combined bar graph here */}
-        <MDBox mt={4.5}>
+        {/* <MDBox mt={4.5}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <MDBox mb={3} borderRadius="lg" bgColor="grey-100" p={3}>
@@ -256,7 +279,7 @@ function PractitionerDashboard() {
               </MDBox>
             </Grid>
           </Grid>
-        </MDBox>
+        </MDBox> */}
       </MDBox>
       <Footer />
     </DashboardLayout>

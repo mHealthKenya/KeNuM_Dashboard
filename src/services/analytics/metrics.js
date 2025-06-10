@@ -61,3 +61,25 @@ export const getInternshipPostingsMetrics = async () => {
     );
   }
 };
+
+export const getRegistrationMetrics = async () => {
+  try {
+    const response = await axios.get(
+      "https://aya-api.mhealthkenya.co.ke/api/dashboard/registrations"
+    );
+    console.log("Registration Metrics response:", response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Failed to Fetch Registration Metrics.");
+  }
+};
+
+export const getRetentionMetrics = async () => {
+  try {
+    const response = await axios.get("https://aya-api.mhealthkenya.co.ke/api/dashboard/retentions");
+    console.log("Retention Metrics response:", response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Failed to Fetch Retention Metrics.");
+  }
+};

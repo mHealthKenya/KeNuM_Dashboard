@@ -1,5 +1,3 @@
-"use client";
-
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
 import MDBox from "components/MDBox";
@@ -12,6 +10,8 @@ import ExamApplicationsBarGraph from "./data/examApplicationBar.js";
 import InternshipApplicationsBarGraph from "./data/internshipApplicationsBar.js";
 import ExamResultsBarGraph from "./data/examResultsBar.js";
 import InternshipPostingsTable from "./data/internshipPostingsTable.js";
+import RegistrationBarGraph from "./data/registrationBarGraph.js";
+import RetentionBarGraph from "./data/retentionBarGraph.js";
 import {
   Table,
   TableBody,
@@ -31,6 +31,8 @@ import {
   getExamResultsMetrics,
   getInternshipApplicationMetrics,
   getInternshipPostingsMetrics,
+  getRegistrationMetrics,
+  getRetentionMetrics,
 } from "services/analytics/metrics";
 import { formatNumberWithCommas } from "utils/formatNumber";
 
@@ -41,6 +43,8 @@ function Dashboard() {
   const [internshipData, setInternshipData] = useState(null);
   const [examResultsData, setExamResultsData] = useState(null);
   const [internshipPostingsData, setInternshipPostingsData] = useState(null);
+  const [registrationData, setRegistrationData] = useState(null);
+  const [retentionData, setRetentionData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -55,6 +59,8 @@ function Dashboard() {
           internshipResponse,
           examResultsResponse,
           internshipPostingsResponse,
+          registrationResponse,
+          retentionResponse,
         ] = await Promise.all([
           getMetrics(),
           getIndexed_Students(),
@@ -62,6 +68,8 @@ function Dashboard() {
           getInternshipApplicationMetrics(),
           getExamResultsMetrics(),
           getInternshipPostingsMetrics(),
+          getRegistrationMetrics(),
+          getRetentionMetrics(),
         ]);
 
         console.log("Metrics:", metricsResponse);
@@ -70,6 +78,8 @@ function Dashboard() {
         console.log("Internship Applications:", internshipResponse);
         console.log("Exam Results:", examResultsResponse);
         console.log("Internship Postings:", internshipPostingsResponse);
+        console.log("Registration Data:", registrationResponse);
+        console.log("Retention Data:", retentionResponse);
 
         setMetrics(metricsResponse || {});
         setStudentData(studentsResponse?.data || []);
@@ -77,6 +87,8 @@ function Dashboard() {
         setInternshipData(internshipResponse || null);
         setExamResultsData(examResultsResponse || null);
         setInternshipPostingsData(internshipPostingsResponse || null);
+        setRegistrationData(registrationResponse || null);
+        setRetentionData(retentionResponse || null);
         setLoading(false);
       } catch (err) {
         setError(err?.message || "An error occurred");
@@ -251,6 +263,24 @@ function Dashboard() {
           </Grid>
         </MDBox>
 
+        {/* Registration Data Chart */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <RegistrationBarGraph data={registrationData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* Retention Data Chart */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <RetentionBarGraph data={retentionData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
         {/* Exam Results Chart */}
         <MDBox mt={4}>
           <Grid container spacing={3}>
@@ -284,26 +314,25 @@ function Dashboard() {
                       <TableRow
                         sx={{
                           backgroundColor: "#E3F2FD",
+                          position: "sticky",
+                          top: 0,
+                          zIndex: 1,
                           "& th": {
                             color: "#0D47A1",
                             fontWeight: "bold",
-                            position: "sticky",
-                            top: 0,
-                            zIndex: 1,
-                            backgroundColor: "#E3F2FD",
                           },
                         }}
                       >
                         <TableCell
                           component="th"
-                          scope="row"
+                          scope="col"
                           sx={{ width: "60%", textAlign: "left" }}
                         >
                           Program
                         </TableCell>
                         <TableCell
                           component="th"
-                          scope="row"
+                          scope="col"
                           sx={{ width: "40%", textAlign: "right" }}
                         >
                           Total Students

@@ -1,3 +1,4 @@
+"use client";
 import PropTypes from "prop-types";
 import { Bar } from "react-chartjs-2";
 import {
@@ -19,8 +20,10 @@ import {
   MenuItem,
   Grid,
   Chip,
+  Button,
 } from "@mui/material";
 import { useState, useMemo } from "react";
+import { FileDownload, Clear } from "@mui/icons-material";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -121,23 +124,38 @@ function ExamResultsBarGraph({ data }) {
     const labels = Object.keys(aggregated).sort();
     const dataValues = labels.map((label) => aggregated[label]);
 
-    // Color scheme based on score types
+    // Consistent blue color palette - avoiding dark-to-light progression
+    const consistentBluePalette = [
+      "rgba(59, 130, 246, 0.8)", // Blue
+      "rgba(37, 99, 235, 0.8)", // Blue-600
+      "rgba(96, 165, 250, 0.8)", // Blue-400
+      "rgba(147, 197, 253, 0.8)", // Blue-300
+      "rgba(30, 64, 175, 0.8)", // Blue-800
+      "rgba(75, 85, 99, 0.8)", // Gray-600
+      "rgba(107, 114, 128, 0.8)", // Gray-500
+      "rgba(156, 163, 175, 0.8)", // Gray-400
+      "rgba(55, 65, 81, 0.8)", // Gray-700
+      "rgba(17, 24, 39, 0.8)", // Gray-900
+    ];
+
+    // Color scheme based on score types or consistent palette
     const getColor = (label, index) => {
       if (groupBy === "score") {
-        const colorMap = {
-          PASS: "rgba(34, 197, 94, 0.6)",
-          FAILED: "rgba(239, 68, 68, 0.6)",
-          CREDIT: "rgba(59, 130, 246, 0.6)",
-          DISTINCTION: "rgba(168, 85, 247, 0.6)",
-          INCOMPLETE: "rgba(251, 191, 36, 0.6)",
-          CANCELLED: "rgba(156, 163, 175, 0.6)",
+        // Fixed colors for score types
+        const scoreColorMap = {
+          PASS: "rgba(34, 197, 94, 0.8)", // Green
+          FAILED: "rgba(239, 68, 68, 0.8)", // Red
+          CREDIT: "rgba(59, 130, 246, 0.8)", // Blue
+          DISTINCTION: "rgba(168, 85, 247, 0.8)", // Purple
+          INCOMPLETE: "rgba(251, 191, 36, 0.8)", // Yellow
+          CANCELLED: "rgba(156, 163, 175, 0.8)", // Gray
         };
-        return (
-          colorMap[label] ||
-          `rgba(${100 + index * 30}, ${150 + index * 20}, ${200 + index * 25}, 0.6)`
-        );
+        return scoreColorMap[label] || consistentBluePalette[index % consistentBluePalette.length];
       }
-      return `rgba(${59 + index * 30}, ${130 + index * 20}, ${246 + index * 15}, 0.6)`;
+
+      // For other groupings, use consistent blue palette with non-sequential pattern
+      const colorIndex = (index * 2) % consistentBluePalette.length;
+      return consistentBluePalette[colorIndex];
     };
 
     return {
@@ -147,7 +165,7 @@ function ExamResultsBarGraph({ data }) {
           label: chartTitle,
           data: dataValues,
           backgroundColor: labels.map((label, index) => getColor(label, index)),
-          borderColor: labels.map((label, index) => getColor(label, index).replace("0.6", "1")),
+          borderColor: labels.map((label, index) => getColor(label, index).replace("0.8", "1")),
           borderWidth: 1,
           borderRadius: 4,
           borderSkipped: false,
@@ -214,6 +232,37 @@ function ExamResultsBarGraph({ data }) {
     return { total, passCount, failCount, passRate };
   }, [processedData.filteredResults]);
 
+  // Export functionality
+  const handleExport = () => {
+    try {
+      const csvContent = [
+        ["Period", "Cadre", "Score", "Total Students"].join(","),
+        ...processedData.filteredResults.map((row) =>
+          [row.period, `"${row.cadre}"`, row.score, row.total].join(",")
+        ),
+      ].join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `exam_results_data_${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Export failed:", error);
+    }
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSelectedPeriod("ALL");
+    setSelectedCadre("ALL");
+    setSelectedScore("ALL");
+  };
+
   return (
     <Card sx={{ p: 3, boxShadow: 2 }}>
       <Box mb={3}>
@@ -226,7 +275,7 @@ function ExamResultsBarGraph({ data }) {
 
         {/* Filters */}
         <Grid container spacing={2} sx={{ mt: 2, mb: 2 }}>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <FormControl fullWidth size="small">
               <InputLabel>Period</InputLabel>
               <Select
@@ -243,7 +292,7 @@ function ExamResultsBarGraph({ data }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <FormControl fullWidth size="small">
               <InputLabel>Cadre</InputLabel>
               <Select
@@ -260,7 +309,7 @@ function ExamResultsBarGraph({ data }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={3}>
             <FormControl fullWidth size="small">
               <InputLabel>Score</InputLabel>
               <Select
@@ -277,10 +326,22 @@ function ExamResultsBarGraph({ data }) {
               </Select>
             </FormControl>
           </Grid>
+          <Grid item xs={12} sm={3}>
+            <Button
+              startIcon={<FileDownload style={{ color: "red" }} />}
+              onClick={handleExport}
+              size="small"
+              variant="outlined"
+              sx={{ ml: "auto" }}
+            >
+              {/* Export */}
+              <span style={{ color: "black" }}>Export</span>
+            </Button>
+          </Grid>
         </Grid>
 
         {/* Active Filters */}
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: 2, display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}>
           {selectedPeriod !== "ALL" && (
             <Chip
               label={`Period: ${selectedPeriod}`}
@@ -307,7 +368,62 @@ function ExamResultsBarGraph({ data }) {
               sx={{ mr: 1, mb: 1 }}
             />
           )}
+          {(selectedPeriod !== "ALL" || selectedCadre !== "ALL" || selectedScore !== "ALL") && (
+            <Button
+              startIcon={<Clear />}
+              onClick={clearAllFilters}
+              size="small"
+              variant="outlined"
+              sx={{ ml: 1 }}
+            >
+              Clear All
+            </Button>
+          )}
         </Box>
+
+        {/* Summary Statistics */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={6} sm={3}>
+            <Box textAlign="center" p={2} bgcolor="primary.light" borderRadius={1}>
+              <Typography variant="h6" color="primary.contrastText">
+                {summaryStats.total.toLocaleString()}
+              </Typography>
+              <Typography variant="caption" color="primary.contrastText">
+                Total Students
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Box textAlign="center" p={2} bgcolor="success.light" borderRadius={1}>
+              <Typography variant="h6" color="success.contrastText">
+                {summaryStats.passCount.toLocaleString()}
+              </Typography>
+              <Typography variant="caption" color="success.contrastText">
+                Passed
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Box textAlign="center" p={2} bgcolor="error.light" borderRadius={1}>
+              <Typography variant="h6" color="error.contrastText">
+                {summaryStats.failCount.toLocaleString()}
+              </Typography>
+              <Typography variant="caption" color="error.contrastText">
+                Failed
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Box textAlign="center" p={2} bgcolor="info.light" borderRadius={1}>
+              <Typography variant="h6" color="info.contrastText">
+                {summaryStats.passRate}%
+              </Typography>
+              <Typography variant="caption" color="info.contrastText">
+                Pass Rate
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
       </Box>
 
       {/* Chart */}
@@ -315,31 +431,35 @@ function ExamResultsBarGraph({ data }) {
         <Bar data={chartData} options={options} />
       </Box>
 
-      {/* Summary Statistics */}
+      {/* Additional Summary */}
       <Box display="grid" gridTemplateColumns={{ xs: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }} gap={2}>
         <Box textAlign="center">
-          <Typography variant="subtitle2" color="primary" fontWeight="bold">
-            Total Students
+          <Typography variant="subtitle2" color="text.secondary" fontWeight="bold">
+            Periods Covered
           </Typography>
-          <Typography variant="body2">{summaryStats.total.toLocaleString()}</Typography>
+          <Typography variant="body1">{processedData.periods.length}</Typography>
         </Box>
         <Box textAlign="center">
-          <Typography variant="subtitle2" color="success.main" fontWeight="bold">
-            Passed
+          <Typography variant="subtitle2" color="text.secondary" fontWeight="bold">
+            Unique Cadres
           </Typography>
-          <Typography variant="body2">{summaryStats.passCount.toLocaleString()}</Typography>
+          <Typography variant="body1">{processedData.cadres.length}</Typography>
         </Box>
         <Box textAlign="center">
-          <Typography variant="subtitle2" color="error.main" fontWeight="bold">
-            Failed
+          <Typography variant="subtitle2" color="text.secondary" fontWeight="bold">
+            Score Types
           </Typography>
-          <Typography variant="body2">{summaryStats.failCount.toLocaleString()}</Typography>
+          <Typography variant="body1">{processedData.scores.length}</Typography>
         </Box>
         <Box textAlign="center">
-          <Typography variant="subtitle2" color="info.main" fontWeight="bold">
-            Pass Rate
+          <Typography variant="subtitle2" color="text.secondary" fontWeight="bold">
+            Avg. per Period
           </Typography>
-          <Typography variant="body2">{summaryStats.passRate}%</Typography>
+          <Typography variant="body1">
+            {processedData.periods.length > 0
+              ? Math.round(summaryStats.total / processedData.periods.length).toLocaleString()
+              : 0}
+          </Typography>
         </Box>
       </Box>
     </Card>
