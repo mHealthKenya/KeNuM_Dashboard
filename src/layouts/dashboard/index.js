@@ -1,3 +1,5 @@
+"use client";
+
 import Grid from "@mui/material/Grid";
 import { useEffect, useState } from "react";
 import MDBox from "components/MDBox";
@@ -12,6 +14,7 @@ import ExamResultsBarGraph from "./data/examResultsBar.js";
 import InternshipPostingsTable from "./data/internshipPostingsTable.js";
 import RegistrationBarGraph from "./data/registrationBarGraph.js";
 import RetentionBarGraph from "./data/retentionBarGraph.js";
+import ExamPieChart from "./data/examResultsPieChart.js";
 import {
   Table,
   TableBody,
@@ -286,6 +289,15 @@ function Dashboard() {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <ExamResultsBarGraph data={examResultsData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* NEW: Exam Results Pie Chart */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <ExamPieChart data={examResultsData} />
             </Grid>
           </Grid>
         </MDBox>

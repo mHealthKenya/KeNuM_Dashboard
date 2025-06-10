@@ -50,6 +50,7 @@ import {
   getInternshipApplicationMetrics,
   getInternshipPostingsMetrics,
 } from "services/analytics/metrics";
+import ExamPieChart from "./data/examResultsPieChart.js";
 
 function StudentDashboard() {
   const { sales, tasks } = reportsLineChartData;
@@ -734,6 +735,15 @@ function StudentDashboard() {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <ExamResultsBarGraph data={examResultsData} />
+            </Grid>
+          </Grid>
+        </MDBox>
+
+        {/* NEW: Exam Results Pie Chart */}
+        <MDBox mt={4}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <ExamPieChart data={examResultsData} />
             </Grid>
           </Grid>
         </MDBox>
