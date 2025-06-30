@@ -1,0 +1,12 @@
+services:
+  api:
+    image: 'devmhk/kenumdashboardweb:1.0.0'
+
+    container_name: kenumdashboardweb
+
+    ports:
+      - '3800:3600'
+
+    env_file: .env
+
+    restart: unless-stopped

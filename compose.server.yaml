@@ -1,0 +1,17 @@
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  kenumdashboardweb:
+    image: 'devmhk/kenumdashboardweb:1.0.0'
+    container_name: 'kenumdashboardweb'
+
+    restart: always
+
+    env_file: .env
+
+    ports:
+      - '3400:3400'
+    networks:
+      - app-tier
